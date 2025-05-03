@@ -6,13 +6,32 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		AFDEF6952DC5C70300699EB9 /* MusicKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFDEF6942DC5C70300699EB9 /* MusicKit.framework */; };
+		AFDEF69A2DC5C8C500699EB9 /* ScrobbleKit in Frameworks */ = {isa = PBXBuildFile; productRef = AFDEF6992DC5C8C500699EB9 /* ScrobbleKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		AFDEF6822DC5BB7600699EB9 /* trackit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = trackit.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AFDEF6942DC5C70300699EB9 /* MusicKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MusicKit.framework; path = System/Library/Frameworks/MusicKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AFDEF6972DC5C72200699EB9 /* Exceptions for "trackit" folder in "trackit" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = AFDEF6812DC5BB7600699EB9 /* trackit */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		AFDEF6842DC5BB7600699EB9 /* trackit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AFDEF6972DC5C72200699EB9 /* Exceptions for "trackit" folder in "trackit" target */,
+			);
 			path = trackit;
 			sourceTree = "<group>";
 		};
@@ -23,6 +42,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AFDEF6952DC5C70300699EB9 /* MusicKit.framework in Frameworks */,
+				AFDEF69A2DC5C8C500699EB9 /* ScrobbleKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -33,6 +54,7 @@
 			isa = PBXGroup;
 			children = (
 				AFDEF6842DC5BB7600699EB9 /* trackit */,
+				AFDEF6932DC5C70300699EB9 /* Frameworks */,
 				AFDEF6832DC5BB7600699EB9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -43,6 +65,14 @@
 				AFDEF6822DC5BB7600699EB9 /* trackit.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		AFDEF6932DC5C70300699EB9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AFDEF6942DC5C70300699EB9 /* MusicKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -65,6 +95,7 @@
 			);
 			name = trackit;
 			packageProductDependencies = (
+				AFDEF6992DC5C8C500699EB9 /* ScrobbleKit */,
 			);
 			productName = trackit;
 			productReference = AFDEF6822DC5BB7600699EB9 /* trackit.app */;
@@ -94,6 +125,9 @@
 			);
 			mainGroup = AFDEF6792DC5BB7600699EB9;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				AFDEF6982DC5C8C500699EB9 /* XCRemoteSwiftPackageReference "ScrobbleKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AFDEF6832DC5BB7600699EB9 /* Products */;
 			projectDirPath = "";
@@ -256,6 +290,10 @@
 				DEVELOPMENT_TEAM = R4B2HA4TUA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = trackit/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Track It - Last.FM Scrobbler";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "To send your listening activity to last.fm";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -284,6 +322,10 @@
 				DEVELOPMENT_TEAM = R4B2HA4TUA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = trackit/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Track It - Last.FM Scrobbler";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_NSAppleMusicUsageDescription = "To send your listening activity to last.fm";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -324,6 +366,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AFDEF6982DC5C8C500699EB9 /* XCRemoteSwiftPackageReference "ScrobbleKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tfmart/ScrobbleKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AFDEF6992DC5C8C500699EB9 /* ScrobbleKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AFDEF6982DC5C8C500699EB9 /* XCRemoteSwiftPackageReference "ScrobbleKit" */;
+			productName = ScrobbleKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = AFDEF67A2DC5BB7600699EB9 /* Project object */;
 }

@@ -291,7 +291,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = trackit/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Track It - Last.FM Scrobbler";
+				INFOPLIST_KEY_CFBundleDisplayName = "Track It";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "To send your listening activity to last.fm";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -323,7 +323,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = trackit/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Track It - Last.FM Scrobbler";
+				INFOPLIST_KEY_CFBundleDisplayName = "Track It";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "To send your listening activity to last.fm";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

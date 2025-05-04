@@ -11,13 +11,14 @@ import ScrobbleKit
 
 struct MainView: View {
     @State private var songs: [Song] = []
-    @State private var toScrobble: [SBKTrackToScrobble] = []
+    @State private var toScrobble: [Song] = []
     @State private var songTitle: String = ""
     @State private var songArtist: String = ""
     @State private var songAlbum: String = ""
     @State private var isScrobbled: Bool = false
     @State private var songProgress: TimeInterval = 0.0
     @State private var songArtwork: UIImage = UIImage()
+    @State private var songDuration: TimeInterval = 0.0
     
     private let songDataTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
@@ -29,28 +30,38 @@ struct MainView: View {
         VStack {
             //Now Playing Track
             ZStack {
+                Color(red: 0.13, green: 0.13, blue: 0.13)
                 HStack {
-                    Image(uiImage: songArtwork).resizable().frame(width: 100, height: 100)
+                    Image(uiImage: songArtwork).resizable().frame(width: 75, height: 75)
+                    Spacer()
                     VStack(alignment: .trailing) {
                         Text(songTitle).font(.headline)
                         HStack {
                             Text(songArtist).font(.caption)
                         }
                     }
-                }
+                }.padding(.horizontal)
             }
-            .padding(.bottom)
-            
-            Divider() //* Temporary
+            .frame(width: 350, height: 100)
+            .cornerRadius(20)
             
             //Tracks not scrobbled
             ForEach(toScrobble) { song in
-                HStack {
-                    Image("")
-                    VStack {
-                        
-                    }
+                ZStack {
+                    Color(red: 0.13, green: 0.13, blue: 0.13)
+                    HStack {
+                        Image(uiImage: songArtwork).resizable().frame(width: 75, height: 75)
+                        Spacer()
+                        VStack(alignment: .trailing) {
+                            Text(songTitle).font(.headline)
+                            HStack {
+                                Text(songArtist).font(.caption)
+                            }
+                        }
+                    }.padding(.horizontal)
                 }
+                .frame(width: 350, height: 100)
+                .cornerRadius(20)
             }
             
             Divider()  //* Temporary
@@ -78,12 +89,11 @@ struct MainView: View {
         if systemMP.playbackState == .playing {
             if let nowPlayingItem = systemMP.nowPlayingItem {
                 if (nowPlayingItem.title != songTitle) {
+                    checkScrobbleStatus()
                     isScrobbled = false
                     print("New track is playing, reset scrobble status")
-                    
-                    //TODO: Remove - This line just tests the previous songs segment. Songs should only display there if they are scrobbled
-                    songs.append(Song(title: songTitle, artist: songArtist, album: songAlbum, artwork: songArtwork))
                 } else if (systemMP.currentPlaybackTime < songProgress && systemMP.currentPlaybackTime < 1) {
+                    checkScrobbleStatus()
                     isScrobbled = false
                     print("Track Restarted, reset status")
                 }
@@ -93,6 +103,7 @@ struct MainView: View {
                 songAlbum = nowPlayingItem.albumTitle ?? "Unknown Artist"
                 
                 songProgress = systemMP.currentPlaybackTime
+                songDuration = nowPlayingItem.playbackDuration
                 
                 if let artwork = nowPlayingItem.artwork  {
                     if artwork.image != nil {
@@ -102,6 +113,29 @@ struct MainView: View {
                 
             }
         }
+    }
+    
+    func checkScrobbleStatus() {
+        if (!isScrobbled && songProgress > (songDuration/2)) {
+            print("scrobbling track")
+            toScrobble.append(Song(
+                title: songTitle,
+                artist: songArtist,
+                album: songAlbum,
+                artwork: songArtwork,
+                timestamp: Date()
+                
+            ))
+            isScrobbled = true
+        }
+    }
+    
+    func scrobble() {
+        if toScrobble.count < 1 {
+            return;
+        }
+        
+        
     }
     
 }
@@ -114,6 +148,7 @@ class Song {
     var album: String
     var scrobbled: Bool
     var artwork: UIImage
+    var timestamp: Date
     
     init() {
         artist = ""
@@ -121,14 +156,16 @@ class Song {
         album = ""
         scrobbled = false
         artwork = UIImage()
+        timestamp = Date()
     }
     
-    init(title: String, artist: String, album: String, artwork: UIImage) {
+    init(title: String, artist: String, album: String, artwork: UIImage, timestamp: Date) {
         self.artist = artist
         self.title = title
         self.album = album
         scrobbled = false
         self.artwork = artwork
+        self.timestamp = timestamp
     }
     
     init(scrobble: SBKTrackToScrobble) {
@@ -137,6 +174,7 @@ class Song {
         album = scrobble.album!
         scrobbled = false
         self.artwork = UIImage()
+        timestamp = scrobble.timestamp
     }
 }
 

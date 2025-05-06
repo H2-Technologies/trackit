@@ -9,14 +9,67 @@ import SwiftUI
 import MusicKit
 import MediaPlayer
 import ScrobbleKit
+import Foundation
+
+enum ScrobbleStatus {
+    case done, pending, failed, noAttempt
+}
+
+class Song {
+    var artist: String
+    var title: String
+    var album: String
+    var scrobbled: ScrobbleStatus
+    var timestamp: Date
+    var favorite: Bool
+    
+    init() {
+        artist = ""
+        title = ""
+        album = ""
+        scrobbled = .noAttempt
+        timestamp = Date()
+        favorite = false
+    }
+    
+    init(title: String, artist: String, album: String, timestamp: Date, favorite: Bool) {
+        self.artist = artist
+        self.title = title
+        self.album = album
+        scrobbled = .noAttempt
+        self.timestamp = timestamp
+        self.favorite = favorite
+    }
+    
+    init(scrobble: SBKTrackToScrobble) {
+        artist = scrobble.artist
+        title = scrobble.track
+        album = scrobble.album!
+        scrobbled = .noAttempt
+        timestamp = scrobble.timestamp
+        favorite = false
+    }
+}
+
+extension Song : Identifiable {
+    public var id: String {
+        self.artist + self.title + DateFormatter().string(from: Date.now)
+    }
+}
+
+extension SBKTrackToScrobble : Identifiable {
+    public var id: String {
+        self.artist + self.track + DateFormatter().string(from: Date.now)
+    }
+}
+
 
 struct MainView: View {
     @State private var songs: [Song] = []
-    @State private var toScrobble: [Song] = []
     @State private var songTitle: String = ""
     @State private var songArtist: String = ""
     @State private var songAlbum: String = ""
-    @State private var isScrobbled: Bool = false
+    @State private var isScrobbled: ScrobbleStatus = .noAttempt
     @State private var songProgress: TimeInterval = 0.0
     @State private var songArtwork: UIImage = UIImage()
     @State private var songDuration: TimeInterval = 0.0
@@ -35,54 +88,57 @@ struct MainView: View {
             if songTitle != "" {
                 ZStack {
                     Color(red: 0.13, green: 0.13, blue: 0.13)
-                    HStack {
-                        Image(uiImage: songArtwork).resizable().frame(width: 75, height: 75).cornerRadius(10)
-                        Spacer()
-                        VStack(alignment: .trailing) {
-                            Text(songTitle).font(.headline).multilineTextAlignment(.trailing)
-                            HStack {
-                                Text(songArtist)
-                                Text("-")
-                                Text(songAlbum)
-                            }.font(.caption)
-                            HStack {
-                                //Image(systemName: isFavorite ? "star.filled" : "star").frame(width: 5, height: 5).padding(.trailing, 5)
-                                Circle().fill(Color.gray).frame(width: 20, height: 20)
-                            }
+                    VStack(alignment: .leading) {
+                        Text(songTitle).font(.headline).multilineTextAlignment(.trailing)
+                        HStack {
+                            Text("\(songArtist) - \(songAlbum)")
+                        }.font(.caption)
+                        HStack {
+                            Circle().fill(Color.gray).frame(width: 10, height: 10)
+                            Text("Now Playing").font(.caption).foregroundStyle(Color.gray)
+                            //Image(systemName: isFavorite ? "star.filled" : "star").frame(width: 5, height: 5).padding(.trailing, 5)
                         }
-                    }.padding(.horizontal)
+                    }
                 }
                 .frame(width: 375, height: 100)
                 .cornerRadius(20)
+            } else if songs.count == 0 {
+                ZStack {
+                    Spacer().containerRelativeFrame([.horizontal, .vertical])
+                    VStack {
+                        Text("No songs played yet").foregroundStyle(Color.gray)
+                    }
+                    
+                }
             }
             
             
             //Tracks not scrobbled
-            ForEach(songs.reversed()) { song in
+            ForEach(songs) { song in
                 ZStack {
                     Color(red: 0.13, green: 0.13, blue: 0.13)
-                    HStack {
-                        Image(uiImage: song.artwork).resizable().frame(width: 75, height: 75).cornerRadius(10)
-                        Spacer()
-                        VStack(alignment: .trailing) {
-                            Text(song.title).font(.headline).multilineTextAlignment(.trailing)
-                            HStack {
-                                Text(song.artist)
-                                Text("-")
-                                Text(song.album)
-                            }.font(.caption)
-                            HStack {
-                                //Image(systemName: isFavorite ? "star.filled" : "star").frame(width: 5, height: 5).padding(.trailing, 5)
-                                Circle().fill(song.scrobbled ? Color.green : Color.yellow).frame(width: 20, height: 20)
-                            }
+                    VStack(alignment: .leading) {
+                        Text(song.title).font(.headline).multilineTextAlignment(.trailing)
+                        HStack {
+                            Text("\(song.artist) - \(song.album)")
+                        }.font(.caption)
+                        HStack {
+                            Circle().fill(
+                                song.scrobbled == .done ? Color.green : song.scrobbled == .pending ? Color.yellow : song.scrobbled == .failed ? Color.red : Color.gray
+                            ).frame(width: 10, height: 10)
+                            Text(RelativeDateTimeFormatter().localizedString(for: song.timestamp, relativeTo: Date())).font(.caption).foregroundStyle(Color.gray)
+                            //Image(systemName: isFavorite ? "star.filled" : "star").frame(width: 5, height: 5).padding(.trailing, 5)
+                            
                         }
-                    }.padding(.horizontal)
+                    }
                 }
                 .frame(width: 375, height: 100)
                 .cornerRadius(20)
                 
             }
         }.onReceive(songDataTimer) { _ in
+            updatePlaybackInfo()
+        }.onAppear() {
             updatePlaybackInfo()
         }
     }
@@ -92,24 +148,15 @@ struct MainView: View {
         let systemMP = MPMusicPlayerController.systemMusicPlayer
         if systemMP.playbackState == .playing {
             if let nowPlayingItem = systemMP.nowPlayingItem {
+                if (nowPlayingItem.title == nil) { return }
                 if (nowPlayingItem.title != songTitle) {
                     checkScrobbleStatus()
-                    isScrobbled = false
+                    isScrobbled = .noAttempt
                     print("New track is playing, reset scrobble status")
-                    if songTitle != "" {
-                        songs.append(Song(
-                            title: songTitle,
-                            artist: songArtist,
-                            album: songAlbum,
-                            artwork: songArtwork,
-                            timestamp: Date(),
-                            favorite: isFavorite
-                        ))
-                    }
                     
                 } else if (systemMP.currentPlaybackTime < songProgress && systemMP.currentPlaybackTime < 1) {
                     checkScrobbleStatus()
-                    isScrobbled = false
+                    isScrobbled = .noAttempt
                     print("Track Restarted, reset status")
                     
                 }
@@ -123,11 +170,6 @@ struct MainView: View {
                 songProgress = systemMP.currentPlaybackTime
                 songDuration = nowPlayingItem.playbackDuration
                 
-                if let artwork = nowPlayingItem.artwork  {
-                    if artwork.image != nil {
-                        songArtwork = artwork.image(at: CGSize(width: 1024, height: 1024)) ?? UIImage()
-                   }
-                }
                 
             }
         }
@@ -140,23 +182,30 @@ struct MainView: View {
     */
     
     func checkScrobbleStatus() {
-        if (!isScrobbled && songProgress > (songDuration/2)) {
+        if (isScrobbled == .noAttempt && songProgress > (songDuration/2)) {
             print("scrobbling track")
-            toScrobble.append(Song(
+            songs.append(Song(
                 title: songTitle,
                 artist: songArtist,
                 album: songAlbum,
-                artwork: songArtwork,
                 timestamp: Date(),
                 favorite: isFavorite
             ))
-            isScrobbled = true
+            isScrobbled = .pending
         }
         
         scrobble()
     }
     
     func scrobble() {
+        var toScrobble: [Song] = []
+        for track in songs {
+            if track.scrobbled == .pending {
+                toScrobble.append(track)
+            }
+        }
+        
+        
         if toScrobble.count < 1 {
             return;
         }
@@ -168,58 +217,4 @@ struct MainView: View {
         
     }
     
-}
-
-
-
-class Song {
-    var artist: String
-    var title: String
-    var album: String
-    var scrobbled: Bool
-    var artwork: UIImage
-    var timestamp: Date
-    var favorite: Bool
-    
-    init() {
-        artist = ""
-        title = ""
-        album = ""
-        scrobbled = false
-        artwork = UIImage()
-        timestamp = Date()
-        favorite = false
-    }
-    
-    init(title: String, artist: String, album: String, artwork: UIImage, timestamp: Date, favorite: Bool) {
-        self.artist = artist
-        self.title = title
-        self.album = album
-        scrobbled = false
-        self.artwork = artwork
-        self.timestamp = timestamp
-        self.favorite = favorite
-    }
-    
-    init(scrobble: SBKTrackToScrobble) {
-        artist = scrobble.artist
-        title = scrobble.track
-        album = scrobble.album!
-        scrobbled = false
-        artwork = UIImage()
-        timestamp = scrobble.timestamp
-        favorite = false
-    }
-}
-
-extension Song : Identifiable {
-    public var id: String {
-        self.artist + self.title + DateFormatter().string(from: Date.now)
-    }
-}
-
-extension SBKTrackToScrobble : Identifiable {
-    public var id: String {
-        self.artist + self.track + DateFormatter().string(from: Date.now)
-    }
 }

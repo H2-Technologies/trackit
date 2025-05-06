@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct SettingsView: View {
-   // @EnvironmentObject var lastFMSession: Session
+    @EnvironmentObject var lastFMSession: Session
     var body: some View {
         VStack {
             ZStack {
                 Text("Hello World")
-                /*
+                
                 if (lastFMSession.username == "") {
                     Button("Sign In") {
                         lastFMSession.username = "test"
@@ -21,7 +21,7 @@ struct SettingsView: View {
                 } else {
                     Text(lastFMSession.username)
                 }
-                 */
+                
             }
         }
     }

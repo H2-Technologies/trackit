@@ -7,16 +7,21 @@
 
 import SwiftUI
 
+class Session: ObservableObject {
+    @Published var token: String = ""
+    var username: String = ""
+}
+
 struct ContentView: View {
-    
+    @StateObject var lastFMSession: Session = Session()
     
     var body: some View {
         TabView {
             Tab("Home", systemImage: "house") {
-                MainView()
+                MainView().environmentObject(lastFMSession)
             }
             Tab("Settings", systemImage: "gear") {
-                SettingsView()
+                SettingsView().environmentObject(lastFMSession)
             }
         }
     }

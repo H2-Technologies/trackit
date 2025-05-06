@@ -75,6 +75,7 @@ struct MainView: View {
     @State private var songDuration: TimeInterval = 0.0
     @State private var isFavorite: Bool = false
     
+    
     private let songDataTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     init() {

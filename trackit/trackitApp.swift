@@ -7,8 +7,11 @@
 
 import SwiftUI
 
+
 @main
 struct trackitApp: App {
+    //@StateObject var lastFMSession 
+    
     var body: some Scene {
         WindowGroup {
             ContentView()

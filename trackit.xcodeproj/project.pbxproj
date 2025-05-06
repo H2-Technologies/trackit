@@ -289,6 +289,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = R4B2HA4TUA;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks/**";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = trackit/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Track It";
@@ -321,6 +322,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = R4B2HA4TUA;
 				ENABLE_PREVIEWS = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks/**";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = trackit/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Track It";

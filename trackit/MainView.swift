@@ -15,29 +15,19 @@ enum ScrobbleStatus {
     case done, pending, failed, noAttempt
 }
 
-class Song {
-    var artist: String
-    var title: String
-    var album: String
-    var scrobbled: ScrobbleStatus
-    var timestamp: Date
-    var favorite: Bool
+class Song: Identifiable {
+    var artist: String = ""
+    var title: String = ""
+    var album: String = ""
+    var scrobbled: ScrobbleStatus = .noAttempt
+    var timestamp: Date = Date()
+    var favorite: Bool = false
+    public var id: String = UUID().uuidString
     
-    init() {
-        artist = ""
-        title = ""
-        album = ""
-        scrobbled = .noAttempt
-        timestamp = Date()
-        favorite = false
-    }
-    
-    init(title: String, artist: String, album: String, timestamp: Date, favorite: Bool) {
+    init(title: String, artist: String, album: String, favorite: Bool) {
         self.artist = artist
         self.title = title
         self.album = album
-        scrobbled = .noAttempt
-        self.timestamp = timestamp
         self.favorite = favorite
     }
     
@@ -45,21 +35,7 @@ class Song {
         artist = scrobble.artist
         title = scrobble.track
         album = scrobble.album!
-        scrobbled = .noAttempt
         timestamp = scrobble.timestamp
-        favorite = false
-    }
-}
-
-extension Song : Identifiable {
-    public var id: String {
-        self.artist + self.title + DateFormatter().string(from: Date.now)
-    }
-}
-
-extension SBKTrackToScrobble : Identifiable {
-    public var id: String {
-        self.artist + self.track + DateFormatter().string(from: Date.now)
     }
 }
 
@@ -189,7 +165,6 @@ struct MainView: View {
                 title: songTitle,
                 artist: songArtist,
                 album: songAlbum,
-                timestamp: Date(),
                 favorite: isFavorite
             ))
             isScrobbled = .pending
@@ -213,7 +188,13 @@ struct MainView: View {
         
         let chunks = chunkArray(array: toScrobble, chunkSize: 50)
         for chunk in chunks {
-            //Scrobble tracks
+            //TODO: Scrobble tracks
+            
+            //TODO: If successful
+            for track in chunk {
+                //TODO: Set track status as .done
+                
+            }
         }
         
     }

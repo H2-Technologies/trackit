@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AF312A5D2DCC304B00FE22D3 /* OAuthSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AF312A5C2DCC304B00FE22D3 /* OAuthSwift */; };
 		AFDEF6952DC5C70300699EB9 /* MusicKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFDEF6942DC5C70300699EB9 /* MusicKit.framework */; };
 		AFDEF69A2DC5C8C500699EB9 /* ScrobbleKit in Frameworks */ = {isa = PBXBuildFile; productRef = AFDEF6992DC5C8C500699EB9 /* ScrobbleKit */; };
 /* End PBXBuildFile section */
@@ -44,6 +45,7 @@
 			files = (
 				AFDEF6952DC5C70300699EB9 /* MusicKit.framework in Frameworks */,
 				AFDEF69A2DC5C8C500699EB9 /* ScrobbleKit in Frameworks */,
+				AF312A5D2DCC304B00FE22D3 /* OAuthSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,6 +98,7 @@
 			name = trackit;
 			packageProductDependencies = (
 				AFDEF6992DC5C8C500699EB9 /* ScrobbleKit */,
+				AF312A5C2DCC304B00FE22D3 /* OAuthSwift */,
 			);
 			productName = trackit;
 			productReference = AFDEF6822DC5BB7600699EB9 /* trackit.app */;
@@ -127,6 +130,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				AFDEF6982DC5C8C500699EB9 /* XCRemoteSwiftPackageReference "ScrobbleKit" */,
+				AF312A5B2DCC304B00FE22D3 /* XCRemoteSwiftPackageReference "OAuthSwift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AFDEF6832DC5BB7600699EB9 /* Products */;
@@ -370,6 +374,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		AF312A5B2DCC304B00FE22D3 /* XCRemoteSwiftPackageReference "OAuthSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/OAuthSwift/OAuthSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.0;
+			};
+		};
 		AFDEF6982DC5C8C500699EB9 /* XCRemoteSwiftPackageReference "ScrobbleKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/tfmart/ScrobbleKit.git";
@@ -381,6 +393,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		AF312A5C2DCC304B00FE22D3 /* OAuthSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AF312A5B2DCC304B00FE22D3 /* XCRemoteSwiftPackageReference "OAuthSwift" */;
+			productName = OAuthSwift;
+		};
 		AFDEF6992DC5C8C500699EB9 /* ScrobbleKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = AFDEF6982DC5C8C500699EB9 /* XCRemoteSwiftPackageReference "ScrobbleKit" */;

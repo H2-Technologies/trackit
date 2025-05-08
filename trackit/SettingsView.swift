@@ -6,23 +6,32 @@
 //
 
 import SwiftUI
+import OAuthSwift
 
 struct SettingsView: View {
     @EnvironmentObject var lastFMSession: Session
+    
+    let apiKey = "";
+    let secret = "";
+    
+    @State private var requestToken: String?
+    @State private var showSafari = false
+    @State private var 
+    
     var body: some View {
         VStack {
             ZStack {
-                Text("Hello World")
-                
                 if (lastFMSession.username == "") {
+                    Color(Color.orange)
                     Button("Sign In") {
-                        lastFMSession.username = "test"
-                    }
+                       
+                    }.foregroundStyle(Color.white)
                 } else {
                     Text(lastFMSession.username)
                 }
-                
-            }
+            }.frame(width: 375, height: 60) //TODO: Round border
+            
+            Spacer()
         }
     }
 }

@@ -10,44 +10,51 @@ import OAuthSwift
 import SafariServices
 import Foundation
 import CryptoKit
+import AsyncObjects
+
+struct Wrapper: Codable {
+    let token: String
+}
 
 struct SettingsView: View {
-    @EnvironmentObject var lastFMSession: Session
+    @EnvironmentObject var lastFM: LastFm
     
     @State private var requestToken: String?
     @State private var showSafari = false
-    @State private var authorizationURL = URL(string: "https://last.fm/api/auth?api_key=\(API_KEY)&token=\(API_SECRET)")
+    @State private var authorizationURL: URL = URL(string: "https://example.com")!;
     @State private var sessionKey: String?
     @State private var sessionusername: String?
     @State private var authError: String?
     
     init() {
-        print(authorizationURL?.string ?? "URL is nil")
-        print(API_SECRET)
+        
     }
     
     var body: some View {
         VStack {
             ZStack {
-                if (lastFMSession.username == "") {
+                //TODO: Convert to just a Button
+                if (lastFM.username == "") {
                     Color(Color.orange)
                     Button("Sign In") {
-                       showSafari = true
+                        Task {
+                            authorizationURL = lastFM.getAuthUrl()
+                            print(authorizationURL.string ?? "URL is nil")
+                            showSafari = true
+                        }
+                       
                     }
                     .foregroundStyle(Color.white)
                     .sheet(isPresented: $showSafari, content: {
-                        if let url = authorizationURL {
-                            SafariView(url: url, onDismiss: {
-                                //TODO: Make this work
-                                print("Safarai view dismissed")
-                                print(url)
-                            })
-                        }
+                        SafariView(url: authorizationURL, onDismiss: {
+                            //TODO: Make this work
+                            print("Safarai view dismissed")
+                        })
                     })
                 } else {
-                    Text(lastFMSession.username)
+                    Text(lastFM.username)
                 }
-            }.frame(width: 375, height: 60) //TODO: Round border
+            }.frame(width: 375, height: 60)
             
             Spacer()
         }
@@ -56,7 +63,7 @@ struct SettingsView: View {
 
 struct SafariView: UIViewControllerRepresentable {
     let url: URL
-    let onDismiss: (() -> Void)?
+    let onDismiss: (() -> Void)
 
     func makeUIViewController(context: UIViewControllerRepresentableContext<SafariView>) -> SFSafariViewController {
         let config = SFSafariViewController.Configuration()
@@ -79,7 +86,7 @@ struct SafariView: UIViewControllerRepresentable {
         }
 
         func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
-            parent.onDismiss?()
+            parent.onDismiss()
         }
     }
 }

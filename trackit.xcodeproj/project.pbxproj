@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AF08FF922DCEE00600B81B98 /* AsyncObjects in Frameworks */ = {isa = PBXBuildFile; productRef = AF08FF912DCEE00600B81B98 /* AsyncObjects */; };
 		AF312A5D2DCC304B00FE22D3 /* OAuthSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AF312A5C2DCC304B00FE22D3 /* OAuthSwift */; };
 		AF4EEB182DCE5C9A00F60EAC /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = AF4EEB172DCE5C9A00F60EAC /* .gitignore */; };
 		AFDEF6952DC5C70300699EB9 /* MusicKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFDEF6942DC5C70300699EB9 /* MusicKit.framework */; };
@@ -24,28 +25,16 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				secrets.swift,
 			);
 			target = AFDEF6812DC5BB7600699EB9 /* trackit */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		AF4EEB162DCE5C8400F60EAC /* Exceptions for "trackit" folder in "Copy Bundle Resources" phase from "trackit" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = AFDEF6802DC5BB7600699EB9 /* Resources */;
-			membershipExceptions = (
-				secrets.swift,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		AFDEF6842DC5BB7600699EB9 /* trackit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				AFDEF6972DC5C72200699EB9 /* Exceptions for "trackit" folder in "trackit" target */,
-				AF4EEB162DCE5C8400F60EAC /* Exceptions for "trackit" folder in "Copy Bundle Resources" phase from "trackit" target */,
 			);
 			path = trackit;
 			sourceTree = "<group>";
@@ -57,6 +46,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AF08FF922DCEE00600B81B98 /* AsyncObjects in Frameworks */,
 				AFDEF6952DC5C70300699EB9 /* MusicKit.framework in Frameworks */,
 				AFDEF69A2DC5C8C500699EB9 /* ScrobbleKit in Frameworks */,
 				AF312A5D2DCC304B00FE22D3 /* OAuthSwift in Frameworks */,
@@ -114,6 +104,7 @@
 			packageProductDependencies = (
 				AFDEF6992DC5C8C500699EB9 /* ScrobbleKit */,
 				AF312A5C2DCC304B00FE22D3 /* OAuthSwift */,
+				AF08FF912DCEE00600B81B98 /* AsyncObjects */,
 			);
 			productName = trackit;
 			productReference = AFDEF6822DC5BB7600699EB9 /* trackit.app */;
@@ -146,6 +137,7 @@
 			packageReferences = (
 				AFDEF6982DC5C8C500699EB9 /* XCRemoteSwiftPackageReference "ScrobbleKit" */,
 				AF312A5B2DCC304B00FE22D3 /* XCRemoteSwiftPackageReference "OAuthSwift" */,
+				AF08FF902DCEE00600B81B98 /* XCRemoteSwiftPackageReference "AsyncObjects" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AFDEF6832DC5BB7600699EB9 /* Products */;
@@ -390,6 +382,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		AF08FF902DCEE00600B81B98 /* XCRemoteSwiftPackageReference "AsyncObjects" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyLab/AsyncObjects.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		AF312A5B2DCC304B00FE22D3 /* XCRemoteSwiftPackageReference "OAuthSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/OAuthSwift/OAuthSwift.git";
@@ -409,6 +409,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		AF08FF912DCEE00600B81B98 /* AsyncObjects */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AF08FF902DCEE00600B81B98 /* XCRemoteSwiftPackageReference "AsyncObjects" */;
+			productName = AsyncObjects;
+		};
 		AF312A5C2DCC304B00FE22D3 /* OAuthSwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = AF312A5B2DCC304B00FE22D3 /* XCRemoteSwiftPackageReference "OAuthSwift" */;

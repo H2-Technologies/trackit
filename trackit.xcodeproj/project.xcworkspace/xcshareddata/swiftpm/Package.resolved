@@ -1,6 +1,15 @@
 {
-  "originHash" : "28520311c7b3b366edf0976484d316c334c1b9ce1f5e11cef2286e9488e6d7a2",
+  "originHash" : "47bc2eea635d4b322a32f09191a5c1ab6b2e41bf38a8e9e904e5540b9231cc80",
   "pins" : [
+    {
+      "identity" : "asyncobjects",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftyLab/AsyncObjects.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "8fa6219a5b9b76325d4eff7afcf4c60b50f3af8d"
+      }
+    },
     {
       "identity" : "brightfutures",
       "kind" : "remoteSourceControl",
@@ -53,6 +62,15 @@
       "state" : {
         "revision" : "e12df14677589e29919352e47a0c500cc2e81fde",
         "version" : "1.1.1"
+      }
+    },
+    {
+      "identity" : "swift-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-collections.git",
+      "state" : {
+        "revision" : "671108c96644956dddcd89dd59c203dcdb36cec7",
+        "version" : "1.1.4"
       }
     },
     {

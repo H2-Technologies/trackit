@@ -26,9 +26,6 @@ struct SettingsView: View {
     @State private var sessionusername: String?
     @State private var authError: String?
     
-    init() {
-        
-    }
     
     var body: some View {
         VStack {
@@ -37,16 +34,12 @@ struct SettingsView: View {
                 if (lastFM.username == "") {
                     Color(Color.orange)
                     Button("Sign In") {
-                        Task {
-                            authorizationURL = lastFM.getAuthUrl()
-                            print(authorizationURL.string ?? "URL is nil")
-                            showSafari = true
-                        }
+                        showSafari = true
                        
                     }
                     .foregroundStyle(Color.white)
                     .sheet(isPresented: $showSafari, content: {
-                        SafariView(url: authorizationURL, onDismiss: {
+                        SafariView(url: lastFM.getAuthUrl(), onDismiss: {
                             //TODO: Make this work
                             print("Safarai view dismissed")
                         })

@@ -9,17 +9,17 @@ import Foundation
 import ScrobbleKit
 
 class LastFm : ObservableObject {
-    public var username: String = ""
+    @Published public var username: String = ""
     private var apiKey: String = Secrets.API_KEY
     private var apiSecret: String = Secrets.API_SECRET
     private var apiToken: String = ""
-    public var manager: SBKManager = SBKManager(apiKey: Secrets.API_KEY, secret: Secrets.API_SECRET)
+    @Published public var manager: SBKManager = SBKManager(apiKey: Secrets.API_KEY, secret: Secrets.API_SECRET)
     
     init() {
         
     }
     
-    func getToken() async throws {
+    func loadToken() async throws {
         let url = URL(string: "https://ws.audioscrobbler.com/2.0/?method=auth.gettoken&api_key=\(self.apiKey)&format=json")!
         let (data, _) = try await URLSession.shared.data(from: url)
         let wrapper = try JSONDecoder().decode(Wrapper.self, from: data)

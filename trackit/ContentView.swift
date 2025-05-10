@@ -14,6 +14,7 @@ class Session: ObservableObject {
 
 struct ContentView: View {
     @StateObject var lastFM: LastFm = LastFm()
+    
     var body: some View {
         TabView {
             Tab("Home", systemImage: "house") {
@@ -22,7 +23,11 @@ struct ContentView: View {
             Tab("Settings", systemImage: "gear") {
                 SettingsView().environmentObject(lastFM)
             }
-        }
+        }.onAppear {
+            Task {
+                try await lastFM.loadToken()
+            }
+        }   
     }
 }
 

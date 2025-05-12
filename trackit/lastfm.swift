@@ -20,7 +20,7 @@ class LastFm : ObservableObject {
     }
     
     func loadToken() async throws {
-        let url = URL(string: "https://ws.audioscrobbler.com/2.0/?method=auth.gettoken&api_key=\(self.apiKey)&format=json")!
+        let url = URL(string: "https://ws.audioscrobbler.com/2.0/?method=auth.gettoken&api_key=\(self.apiKey)&cb=trackit:callback&format=json")!
         let (data, _) = try await URLSession.shared.data(from: url)
         let wrapper = try JSONDecoder().decode(Wrapper.self, from: data)
         

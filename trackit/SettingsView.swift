@@ -6,11 +6,10 @@
 //
 
 import SwiftUI
-import OAuthSwift
 import SafariServices
 import Foundation
-import CryptoKit
 import AsyncObjects
+
 
 struct Wrapper: Codable {
     let token: String
@@ -29,35 +28,33 @@ struct SettingsView: View {
     
     var body: some View {
         VStack {
-            ZStack {
-                //TODO: Convert to just a Button
-                if (lastFM.username == "") {
-                    Color(Color.orange)
-                    Button("Sign In") {
-                        showSafari = true
-                       
-                    }
-                    .foregroundStyle(Color.white)
-                    .sheet(isPresented: $showSafari, content: {
-                        SafariView(url: lastFM.getAuthUrl(), onDismiss: {
-                            //TODO: Make this work
-                            print("Safarai view dismissed")
-                        })
-                    })
-                } else {
-                    Text(lastFM.username)
+            //TODO: Convert to just a Button
+            if (lastFM.username == "") {
+                Button("Sign In") {
+                    showSafari = true
                 }
-            }.frame(width: 375, height: 60)
-            
-            Spacer()
+                .foregroundStyle(Color.white)
+                .backgroundStyle(Color.orange)
+                .frame(width: 375, height: 60)
+                .sheet(isPresented: $showSafari, onDismiss: {
+                    print("Safari view dismissed")
+                }, content: {
+                    SafariView(url: lastFM.getAuthUrl())
+                })
+            } else {
+                Text(lastFM.username)
+            }
         }
+        .onOpenURL(perform: { url in
+            print(url)
+        })
     }
 }
 
 struct SafariView: UIViewControllerRepresentable {
     let url: URL
-    let onDismiss: (() -> Void)
-
+    let onDismiss: (() -> Void)? = nil
+    
     func makeUIViewController(context: UIViewControllerRepresentableContext<SafariView>) -> SFSafariViewController {
         let config = SFSafariViewController.Configuration()
         let viewController = SFSafariViewController(url: url, configuration: config)
@@ -79,7 +76,7 @@ struct SafariView: UIViewControllerRepresentable {
         }
 
         func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
-            parent.onDismiss()
+            parent.onDismiss?()
         }
     }
 }

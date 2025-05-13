@@ -49,6 +49,10 @@ struct SettingsView: View {
             print(url)
         })
     }
+    
+    public func handleCallback() {
+        
+    }
 }
 
 struct SafariView: UIViewControllerRepresentable {

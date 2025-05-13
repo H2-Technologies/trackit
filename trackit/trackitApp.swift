@@ -9,7 +9,6 @@ import SwiftUI
 import UIKit
 
 
-
 @main
 struct trackitApp: App {
     var body: some Scene {
@@ -18,6 +17,7 @@ struct trackitApp: App {
             ContentView()
         }
     }
+    
     
 }
 
@@ -32,6 +32,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                   print("Invalid URL")
                  return false
         }
+        
+        print("Path: \(path)")
+        print("Params: \(params)")
         
         return true
     }

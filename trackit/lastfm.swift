@@ -20,7 +20,17 @@ class LastFm : ObservableObject {
     }
     
     func initManager(token: String) {
-        
+        print(token)
+        manager.setSessionKey(token)
+        Task {
+            try await getUsername()
+        }
+    }
+    
+    func getUsername() async throws {
+        print("lastfm - Attempting to fetch username")
+        let result = try await manager.getInfo(forUser: "")
+        print("lastfm - \(result)")
     }
     
     func getAuthUrl() -> URL {

@@ -37,7 +37,7 @@ struct SettingsView: View {
                 .backgroundStyle(Color.orange)
                 .frame(width: 375, height: 60)
                 .sheet(isPresented: $showSafari, onDismiss: {
-                    print("Safari view dismissed")
+                    
                 }, content: {
                     SafariView(url: lastFM.getAuthUrl())
                 })
@@ -46,7 +46,8 @@ struct SettingsView: View {
             }
         }
         .onOpenURL(perform: { url in
-            lastFM.initManager(token: url.absoluteString.split(separator: "=")[1])
+            showSafari = false
+            lastFM.initManager(token: String(url.absoluteString.split(separator: "=")[1]))
         })
     }
 }

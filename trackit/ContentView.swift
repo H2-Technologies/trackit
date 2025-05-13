@@ -23,15 +23,7 @@ struct ContentView: View {
             Tab("Settings", systemImage: "gear") {
                 SettingsView().environmentObject(lastFM)
             }
-        }.onAppear {
-            Task {
-                try await lastFM.loadToken()
-            }
-        }   
-    }
-    
-    public func handleCallback() {
-        
+        }
     }
 }
 

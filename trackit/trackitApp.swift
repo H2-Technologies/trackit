@@ -20,22 +20,3 @@ struct trackitApp: App {
     
     
 }
-
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-    func application(_ application: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        let sendingAppID = options[.sourceApplication]
-        print("Source Application: \(sendingAppID ?? "Unknown"))")
-        
-        guard let components = NSURLComponents(url: url, resolvingAgainstBaseURL: true),
-              let path = components.path,
-              let params = components.queryItems else {
-                  print("Invalid URL")
-                 return false
-        }
-        
-        print("Path: \(path)")
-        print("Params: \(params)")
-        
-        return true
-    }
-}

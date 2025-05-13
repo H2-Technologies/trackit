@@ -29,6 +29,10 @@ struct ContentView: View {
             }
         }   
     }
+    
+    public func handleCallback() {
+        
+    }
 }
 
 

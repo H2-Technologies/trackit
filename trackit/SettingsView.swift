@@ -46,12 +46,8 @@ struct SettingsView: View {
             }
         }
         .onOpenURL(perform: { url in
-            print(url)
+            lastFM.initManager(token: url.absoluteString.split(separator: "=")[1])
         })
-    }
-    
-    public func handleCallback() {
-        
     }
 }
 

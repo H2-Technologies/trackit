@@ -10,7 +10,7 @@ import ScrobbleKit
 import CryptoKit
 
 class LastFm : ObservableObject {
-    @Published public var username: String = ""
+    public var username: String = ""
     private var apiKey: String = Secrets.API_KEY
     private var apiSecret: String = Secrets.API_SECRET
     private var apiToken: String = ""
@@ -21,30 +21,50 @@ class LastFm : ObservableObject {
     }
     
     func initManager(token: String) {
-        print(token)
         manager.setSessionKey(token)
         apiToken = token
         Task {
             try await getSession()
         }
+        print("lastfm:initManager - \(username)")
     }
     
     func getSession() async throws {
-        let sig = Insecure.MD5.hash(data: "api_key\(apiKey)methodauth.getSessiontoken\(apiToken)\(apiSecret)".data(using: .utf8)!)
+        let sig = Insecure.MD5.hash(data: "api_key\(apiKey)methodauth.getSessiontoken\(apiToken)\(apiSecret)".data(using: .utf8)!).map {
+                String(format: "%02x", $0)
+            }.joined()
         
-        print(sig.description.split(separator: ": ")[1])
-        
-        let url = URL(string: "https://ws.audioscrobbler.com/2.0/?method=auth.getsession&token=\(apiToken)&api_key=\(apiKey)&api_sig=\(sig.description.split(separator: ": ")[1])")!
-        
-        print(url)
+        let url = URL(string: "https://ws.audioscrobbler.com/2.0/?method=auth.getSession&token=\(apiToken)&api_key=\(apiKey)&api_sig=\(sig)&format=json")!
         
         let (data, _) = try await URLSession.shared.data(from: url)
+        let dataStr = try JSONDecoder().decode(SessionResponse.self, from: data)
         
-        print(XMLParser(data: data).parse())
+        username = dataStr.session.name
+        
+        print("lastfm:getSession - \(username)")
     }
     
     func getAuthUrl() -> URL {
         return URL(string: "https://last.fm/api/auth?api_key=\(self.apiKey)&cb=trackit://callback")!
     }
     
+    
+    struct SessionResponse: Codable {
+        var session: SessionResponseSession
+        /*
+         {
+           "session": {
+             "name": "svalencia014",
+             "key": "oEk3_Sw0JRIOabcqDEfmx0e4fGZNGr3P",
+             "subscriber": 1
+           }
+         }
+         */
+    }
+    
+    struct SessionResponseSession: Codable {
+        var name: String
+        var key: String
+        var subscriber: Int
+    }
 }

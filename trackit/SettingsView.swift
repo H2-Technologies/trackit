@@ -22,7 +22,7 @@ struct SettingsView: View {
     @State private var showSafari = false
     @State private var authorizationURL: URL = URL(string: "https://example.com")!;
     @State private var sessionKey: String?
-    @State private var sessionusername: String?
+    @State private var sessionUsername: String?
     @State private var authError: String?
     
     
@@ -48,6 +48,8 @@ struct SettingsView: View {
         .onOpenURL(perform: { url in
             showSafari = false
             lastFM.initManager(token: String(url.absoluteString.split(separator: "=")[1]))
+            let username = lastFM.username
+            print("SettingsView - \(username)")
         })
     }
 }

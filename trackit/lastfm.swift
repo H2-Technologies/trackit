@@ -7,6 +7,7 @@
 
 import Foundation
 import ScrobbleKit
+import CryptoKit
 
 class LastFm : ObservableObject {
     @Published public var username: String = ""
@@ -22,15 +23,24 @@ class LastFm : ObservableObject {
     func initManager(token: String) {
         print(token)
         manager.setSessionKey(token)
+        apiToken = token
         Task {
-            try await getUsername()
+            try await getSession()
         }
     }
     
-    func getUsername() async throws {
-        print("lastfm - Attempting to fetch username")
-        let result = try await manager.getInfo(forUser: "")
-        print("lastfm - \(result)")
+    func getSession() async throws {
+        let sig = Insecure.MD5.hash(data: "api_key\(apiKey)methodauth.getSessiontoken\(apiToken)\(apiSecret)".data(using: .utf8)!)
+        
+        print(sig.description.split(separator: ": ")[1])
+        
+        let url = URL(string: "https://ws.audioscrobbler.com/2.0/?method=auth.getsession&token=\(apiToken)&api_key=\(apiKey)&api_sig=\(sig.description.split(separator: ": ")[1])")!
+        
+        print(url)
+        
+        let (data, _) = try await URLSession.shared.data(from: url)
+        
+        print(XMLParser(data: data).parse())
     }
     
     func getAuthUrl() -> URL {

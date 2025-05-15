@@ -41,6 +41,8 @@ class Song: Identifiable {
 
 
 struct MainView: View {
+    @EnvironmentObject var lastFM: LastFm
+    
     @State private var songs: [Song] = []
     @State private var songTitle: String = ""
     @State private var songArtist: String = ""
@@ -55,7 +57,7 @@ struct MainView: View {
     private let songDataTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     init() {
-        updatePlaybackInfo()
+        
     }
     
     
@@ -114,9 +116,13 @@ struct MainView: View {
                 
             }
         }.onReceive(songDataTimer) { _ in
+            guard lastFM.isInitialized else {
+                print("not initialized")
+                return
+            }
             updatePlaybackInfo()
         }.onAppear() {
-            updatePlaybackInfo()
+            _ = lastFM.initManager()
         }
     }
     
@@ -148,6 +154,12 @@ struct MainView: View {
                 songDuration = nowPlayingItem.playbackDuration
                 
                 
+                lastFM.updateNowPlaying(song: Song(
+                    title: songTitle,
+                    artist: songArtist,
+                    album: songAlbum,
+                    favorite: isFavorite
+                ))
             }
         }
     }
@@ -178,23 +190,38 @@ struct MainView: View {
         for track in songs {
             if track.scrobbled == .pending {
                 toScrobble.append(track)
+                
             }
         }
         
         
         if toScrobble.count < 1 {
             return;
+        } else if toScrobble.count < 2 {
+            Task {
+                if try await lastFM.scrobbleTrack(song: toScrobble[0]) {
+                    print("succesfully scrobbled")
+                    toScrobble[0].scrobbled = .done
+                } else {
+                    print("scrobble failed")
+                    toScrobble[0].scrobbled = .failed
+                }
+            }
         }
         
         let chunks = chunkArray(array: toScrobble, chunkSize: 50)
         for chunk in chunks {
             //TODO: Scrobble tracks
-            
-            //TODO: If successful
-            for track in chunk {
-                //TODO: Set track status as .done
-                
+            if lastFM.scrobbleTracks(songs: chunk) {
+                for track in chunk {
+                    track.scrobbled = .done
+                }
+            } else {
+                for track in chunk {
+                    track.scrobbled = .failed
+                }
             }
+            
         }
         
     }

@@ -11,6 +11,8 @@ import CryptoKit
 
 class LastFm : ObservableObject {
     public var username: String = ""
+    public var isInitialized: Bool = false
+    
     private var apiKey: String = Secrets.API_KEY
     private var apiSecret: String = Secrets.API_SECRET
     private var apiToken: String = ""
@@ -23,8 +25,10 @@ class LastFm : ObservableObject {
             return nil
         } else {
             manager.setSessionKey(token!)
+            self.isInitialized = true
             return username!
         }
+        
     }
     
     func initManager(token: String) async throws -> String {
@@ -54,6 +58,44 @@ class LastFm : ObservableObject {
         return URL(string: "https://last.fm/api/auth?api_key=\(self.apiKey)&cb=trackit://callback")!
     }
     
+    func updateNowPlaying(song: Song) {
+         manager.updateNowPlaying(
+            artist: song.artist,
+            track: song.title
+        )
+    }
+    
+    func scrobbleTrack(song: Song) async throws -> Bool {
+         //TODO: Implement
+        
+        let track = SBKTrackToScrobble(
+            artist: song.artist,
+            track: song.title,
+            timestamp: song.timestamp,
+            album: song.album
+        )
+        
+        let response = try await manager.scrobble(tracks: [track])
+        if response.isCompletelySuccessful {
+            return true
+        } else {
+            if let result = response.results.first {
+                if result.isAccepted {
+                    return true
+                } else if let error = result.error {
+                    return false
+                }
+            }
+        }
+        
+        return false
+    }
+    
+    func scrobbleTracks(songs: [Song]) -> Bool {
+        //TODO: Implement
+        
+        return false
+    }
     
     struct SessionResponse: Codable {
         var session: SessionResponseSession

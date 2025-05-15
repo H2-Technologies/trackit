@@ -88,12 +88,7 @@ struct SettingsView: View {
             }
         })
         .onAppear(perform: {
-            let initResult = lastFM.initManager()
-            if initResult == nil {
-                sessionUsername = ""
-            } else {
-                sessionUsername = initResult!
-            }
+            sessionUsername = lastFM.username
         })
     }
 }

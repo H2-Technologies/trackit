@@ -20,8 +20,18 @@ class LastFm : ObservableObject {
         
     }
     
+    func initManager() -> String? {
+        let (username, token) = KeychainInterface.fetchUserInfo()
+        
+        if username == nil || token == nil {
+            return nil
+        } else {
+            manager.setSessionKey(token!)
+            return username!
+        }
+    }
+    
     func initManager(token: String) async throws -> String {
-        manager.setSessionKey(token)
         apiToken = token
         try await getSession()
         print("lastfm:initManager - \(username)")
@@ -39,6 +49,10 @@ class LastFm : ObservableObject {
         let dataStr = try JSONDecoder().decode(SessionResponse.self, from: data)
         
         username = dataStr.session.name
+        
+        manager.setSessionKey(dataStr.session.key)
+        
+        KeychainInterface.saveUserInfo(username: username, token: dataStr.session.key)
         
         print("lastfm:getSession - \(username)")
     }

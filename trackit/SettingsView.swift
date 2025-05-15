@@ -53,6 +53,14 @@ struct SettingsView: View {
                 print("SettingsView - \(sessionUsername)")
             }
         })
+        .onAppear(perform: {
+            let initResult = lastFM.initManager()
+            if initResult == nil {
+                sessionUsername = ""
+            } else {
+                sessionUsername = initResult!
+            }
+        })
     }
 }
 

@@ -20,13 +20,12 @@ class LastFm : ObservableObject {
         
     }
     
-    func initManager(token: String) {
+    func initManager(token: String) async throws -> String {
         manager.setSessionKey(token)
         apiToken = token
-        Task {
-            try await getSession()
-        }
+        try await getSession()
         print("lastfm:initManager - \(username)")
+        return username
     }
     
     func getSession() async throws {
@@ -51,15 +50,6 @@ class LastFm : ObservableObject {
     
     struct SessionResponse: Codable {
         var session: SessionResponseSession
-        /*
-         {
-           "session": {
-             "name": "svalencia014",
-             "key": "oEk3_Sw0JRIOabcqDEfmx0e4fGZNGr3P",
-             "subscriber": 1
-           }
-         }
-         */
     }
     
     struct SessionResponseSession: Codable {

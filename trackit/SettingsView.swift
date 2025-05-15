@@ -22,14 +22,14 @@ struct SettingsView: View {
     @State private var showSafari = false
     @State private var authorizationURL: URL = URL(string: "https://example.com")!;
     @State private var sessionKey: String?
-    @State private var sessionUsername: String?
+    @State private var sessionUsername: String = ""
     @State private var authError: String?
     
     
     var body: some View {
         VStack {
             //TODO: Convert to just a Button
-            if (lastFM.username == "") {
+            if (sessionUsername == "") {
                 Button("Sign In") {
                     showSafari = true
                 }
@@ -42,14 +42,16 @@ struct SettingsView: View {
                     SafariView(url: lastFM.getAuthUrl())
                 })
             } else {
-                Text(lastFM.username)
+                Text(sessionUsername)
             }
         }
         .onOpenURL(perform: { url in
             showSafari = false
-            lastFM.initManager(token: String(url.absoluteString.split(separator: "=")[1]))
-            let username = lastFM.username
-            print("SettingsView - \(username)")
+            Task {
+                sessionUsername = try await lastFM.initManager(token: String(url.absoluteString.split(separator: "=")[1]))
+                //let username = lastFM.username
+                print("SettingsView - \(sessionUsername)")
+            }
         })
     }
 }

@@ -16,10 +16,6 @@ class LastFm : ObservableObject {
     private var apiToken: String = ""
     @Published public var manager: SBKManager = SBKManager(apiKey: Secrets.API_KEY, secret: Secrets.API_SECRET)
     
-    init() {
-        
-    }
-    
     func initManager() -> String? {
         let (username, token) = KeychainInterface.fetchUserInfo()
         
@@ -34,7 +30,6 @@ class LastFm : ObservableObject {
     func initManager(token: String) async throws -> String {
         apiToken = token
         try await getSession()
-        print("lastfm:initManager - \(username)")
         return username
     }
     
@@ -52,9 +47,7 @@ class LastFm : ObservableObject {
         
         manager.setSessionKey(dataStr.session.key)
         
-        KeychainInterface.saveUserInfo(username: username, token: dataStr.session.key)
-        
-        print("lastfm:getSession - \(username)")
+        _ = KeychainInterface.saveUserInfo(username: username, token: dataStr.session.key)
     }
     
     func getAuthUrl() -> URL {

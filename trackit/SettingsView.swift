@@ -43,14 +43,16 @@ struct SettingsView: View {
                 })
             } else {
                 Text(sessionUsername)
+                Button("Log Out") {
+                    KeychainInterface.clearInfo()
+                    sessionUsername = ""
+                }
             }
         }
         .onOpenURL(perform: { url in
             showSafari = false
             Task {
                 sessionUsername = try await lastFM.initManager(token: String(url.absoluteString.split(separator: "=")[1]))
-                //let username = lastFM.username
-                print("SettingsView - \(sessionUsername)")
             }
         })
         .onAppear(perform: {

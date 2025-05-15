@@ -102,6 +102,31 @@ struct KeychainInterface {
         return (uResult, tResult)
     }
     
+    static public func clearInfo() {
+        clearUsername()
+        clearToken()
+    }
+    
+    static func clearUsername() {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: KeychainConstraints.service,
+            kSecAttrAccount as String: KeychainConstraints.usernameAccount,
+        ]
+        
+        SecItemDelete(query as CFDictionary)
+    }
+    
+    static func clearToken() {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: KeychainConstraints.service,
+            kSecAttrAccount as String: KeychainConstraints.tokenAccount,
+        ]
+        
+        SecItemDelete(query as CFDictionary)
+    }
+    
     
 }
 

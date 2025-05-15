@@ -31,17 +31,18 @@ struct SettingsView: View {
         VStack {
             //TODO: Convert to just a Button
             if (sessionUsername == "") {
-                Button("Sign In") {
-                    showSafari = true
+                ZStack {
+                    Color(.orange)
+                    Text("Sign In").font(.headline)
                 }
+                .onTapGesture { showSafari = true }
                 .frame(width: 375, height: 60)
-                .background(.orange)
-                .foregroundStyle(.white)
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                
                 .sheet(isPresented: $showSafari, onDismiss: {}, content: {
                     SafariView(url: lastFM.getAuthUrl())
                 })
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-                .font(.headline)
+                
             } else {
                 ZStack {
                     HStack {
@@ -54,12 +55,13 @@ struct SettingsView: View {
                             .frame(width: 1)
                             .foregroundColor(.black)
                         
-                        Button("Log Out") {
+                        Text("Log Out").onTapGesture {
                             KeychainInterface.clearInfo()
                             sessionUsername = ""
                         }
                         .font(.headline)
-                        .padding(.leading)
+                        .padding()
+                        .clipShape(Rectangle())
                     }
                     .frame(width: 375, height: 60)
                     .background(customGray)

@@ -25,6 +25,7 @@ struct SettingsView: View {
     @State private var sessionUsername: String = ""
     @State private var authError: String?
     
+    private var customGray = Color(red: 38 / 255, green: 38 / 255, blue: 48 / 255)
     
     var body: some View {
         VStack {
@@ -33,21 +34,50 @@ struct SettingsView: View {
                 Button("Sign In") {
                     showSafari = true
                 }
-                .foregroundStyle(Color.white)
-                .backgroundStyle(Color.orange)
                 .frame(width: 375, height: 60)
-                .sheet(isPresented: $showSafari, onDismiss: {
-                    
-                }, content: {
+                .background(.orange)
+                .foregroundStyle(.white)
+                .sheet(isPresented: $showSafari, onDismiss: {}, content: {
                     SafariView(url: lastFM.getAuthUrl())
                 })
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .font(.headline)
             } else {
-                Text(sessionUsername)
-                Button("Log Out") {
-                    KeychainInterface.clearInfo()
-                    sessionUsername = ""
+                ZStack {
+                    HStack {
+                        Text(sessionUsername)
+                            .font(.headline)
+                            .frame(width: 200)
+                        
+                        //Add for style
+                        Rectangle()
+                            .frame(width: 1)
+                            .foregroundColor(.black)
+                        
+                        Button("Log Out") {
+                            KeychainInterface.clearInfo()
+                            sessionUsername = ""
+                        }
+                        .font(.headline)
+                        .padding(.leading)
+                    }
+                    .frame(width: 375, height: 60)
+                    .background(customGray)
+                    .foregroundStyle(.orange)
                 }
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .frame(width: 375, height: 60)
             }
+            
+            /*
+            Text("Extras").font(.caption).padding()
+            
+            Button("Rate App") {}
+            Button("Contact Developer") {}
+             
+             */
+            
+            Spacer()
         }
         .onOpenURL(perform: { url in
             showSafari = false

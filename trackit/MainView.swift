@@ -53,8 +53,8 @@ struct MainView: View {
     @State private var songDuration: TimeInterval = 0.0
     @State private var isFavorite: Bool = false
     
-    
-    private let songDataTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    //TODO: Optimize for battery
+    private let songDataTimer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
     
     init() {
         
@@ -123,6 +123,11 @@ struct MainView: View {
             updatePlaybackInfo()
         }.onAppear() {
             _ = lastFM.initManager()
+            guard lastFM.isInitialized else {
+                print("not initialized")
+                return
+            }
+            updatePlaybackInfo()
         }
     }
     
@@ -132,17 +137,6 @@ struct MainView: View {
         if systemMP.playbackState == .playing {
             if let nowPlayingItem = systemMP.nowPlayingItem {
                 if (nowPlayingItem.title == nil) { return }
-                if (nowPlayingItem.title != songTitle) {
-                    checkScrobbleStatus()
-                    isScrobbled = .noAttempt
-                    print("New track is playing, reset scrobble status")
-                    
-                } else if (systemMP.currentPlaybackTime < songProgress && systemMP.currentPlaybackTime < 1) {
-                    checkScrobbleStatus()
-                    isScrobbled = .noAttempt
-                    print("Track Restarted, reset status")
-                    
-                }
                 
                 songTitle = nowPlayingItem.title ?? "Unknown Track"
                 songArtist = nowPlayingItem.artist ?? "Unknown Artist"

@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SafariServices
 import Foundation
 import AsyncObjects
 
@@ -16,7 +15,7 @@ struct Wrapper: Codable {
 }
 
 struct SettingsView: View {
-    @EnvironmentObject var lastFM: LastFm
+    @EnvironmentObject var lastfm: LastFM
     
     @State private var requestToken: String?
     @State private var showSafari = false
@@ -40,7 +39,7 @@ struct SettingsView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 20))
                 
                 .sheet(isPresented: $showSafari, onDismiss: {}, content: {
-                    SafariView(url: lastFM.getAuthUrl())
+                    SafariView(url: lastfm.getAuthUrl())
                 })
                 
             } else {
@@ -84,41 +83,11 @@ struct SettingsView: View {
         .onOpenURL(perform: { url in
             showSafari = false
             Task {
-                sessionUsername = try await lastFM.initManager(token: String(url.absoluteString.split(separator: "=")[1]))
+                sessionUsername = try await lastfm.initManager(token: String(url.absoluteString.split(separator: "=")[1]))
             }
         })
         .onAppear(perform: {
-            sessionUsername = lastFM.username
+            sessionUsername = lastfm.username
         })
-    }
-}
-
-struct SafariView: UIViewControllerRepresentable {
-    let url: URL
-    let onDismiss: (() -> Void)? = nil
-    
-    func makeUIViewController(context: UIViewControllerRepresentableContext<SafariView>) -> SFSafariViewController {
-        let config = SFSafariViewController.Configuration()
-        let viewController = SFSafariViewController(url: url, configuration: config)
-        return viewController
-    }
-
-    func updateUIViewController(_ uiViewController: SFSafariViewController, context: UIViewControllerRepresentableContext<SafariView>) {
-    }
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
-    }
-
-    class Coordinator: NSObject, SFSafariViewControllerDelegate {
-        let parent: SafariView
-
-        init(_ parent: SafariView) {
-            self.parent = parent
-        }
-
-        func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
-            parent.onDismiss?()
-        }
     }
 }

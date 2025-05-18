@@ -8,8 +8,9 @@
 import Foundation
 import ScrobbleKit
 import CryptoKit
+import MediaPlayer
 
-class LastFm : ObservableObject {
+class LastFM : ObservableObject {
     public var username: String = ""
     public var isInitialized: Bool = false
     
@@ -58,10 +59,12 @@ class LastFm : ObservableObject {
         return URL(string: "https://last.fm/api/auth?api_key=\(self.apiKey)&cb=trackit://callback")!
     }
     
-    func updateNowPlaying(song: Song) {
+    // * PRECONDITION: Media Player is playing, so song and it's props aren't nil
+    func updateNowPlaying(song: MPMediaItem) {
          manager.updateNowPlaying(
-            artist: song.artist,
-            track: song.title
+            artist: song.artist!,
+            track: song.title!,
+            album: song.albumTitle!
         )
     }
     

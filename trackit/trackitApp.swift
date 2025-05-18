@@ -11,10 +11,21 @@ import UIKit
 
 @main
 struct trackitApp: App {
+    @StateObject var lastfm: LastFM = LastFM()
+    
     var body: some Scene {
-        
         WindowGroup {
-            ContentView()
+            TabView {
+                Tab("Home", systemImage: "house") {
+                    MainView()
+                }
+                Tab("Settings", systemImage: "gear") {
+                    SettingsView()
+                }
+            }.environmentObject(lastfm)
+                .onAppear(perform: {
+                    _ = lastfm.initManager()
+                })
         }
     }
     

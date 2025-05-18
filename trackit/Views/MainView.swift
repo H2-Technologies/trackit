@@ -15,7 +15,7 @@ enum ScrobbleStatus {
     case done, pending, failed, noAttempt
 }
 
-class Song: Identifiable {
+class Song: Identifiable, Equatable {
     var artist: String = ""
     var title: String = ""
     var album: String = ""
@@ -37,20 +37,24 @@ class Song: Identifiable {
         album = scrobble.album!
         timestamp = scrobble.timestamp
     }
+    
+    static func == (lhs: Song, rhs: Song) -> Bool {
+        return lhs.title == rhs.title &&
+               lhs.artist == rhs.artist &&
+               lhs.album == rhs.album
+    }
 }
 
 
 struct MainView: View {
-    @EnvironmentObject var lastFM: LastFm
+    @EnvironmentObject var lastfm: LastFM
     
     @State private var songs: [Song] = []
     @State private var songTitle: String = ""
     @State private var songArtist: String = ""
     @State private var songAlbum: String = ""
     @State private var isScrobbled: ScrobbleStatus = .noAttempt
-    @State private var songProgress: TimeInterval = 0.0
-    @State private var songArtwork: UIImage = UIImage()
-    @State private var songDuration: TimeInterval = 0.0
+    //@State private var songArtwork: UIImage = UIImage()
     @State private var isFavorite: Bool = false
     
     //TODO: Optimize for battery
@@ -116,14 +120,14 @@ struct MainView: View {
                 
             }
         }.onReceive(songDataTimer) { _ in
-            guard lastFM.isInitialized else {
+            guard lastfm.isInitialized else {
                 print("not initialized")
                 return
             }
             updatePlaybackInfo()
         }.onAppear() {
-            _ = lastFM.initManager()
-            guard lastFM.isInitialized else {
+            _ = lastfm.initManager()
+            guard lastfm.isInitialized else {
                 print("not initialized")
                 return
             }
@@ -136,88 +140,21 @@ struct MainView: View {
         let systemMP = MPMusicPlayerController.systemMusicPlayer
         if systemMP.playbackState == .playing {
             if let nowPlayingItem = systemMP.nowPlayingItem {
-                if (nowPlayingItem.title == nil) { return }
+                if (nowPlayingItem.title == nil) {
+                    return
+                } else {
+                    
+                }
                 
-                songTitle = nowPlayingItem.title ?? "Unknown Track"
-                songArtist = nowPlayingItem.artist ?? "Unknown Artist"
-                songAlbum = nowPlayingItem.albumTitle ?? "Unknown Artist"
+                songTitle = nowPlayingItem.title!
+                songArtist = nowPlayingItem.artist!
+                songAlbum = nowPlayingItem.albumTitle!
                 
                 //checkIfTrackIsLoved()
                 
-                songProgress = systemMP.currentPlaybackTime
-                songDuration = nowPlayingItem.playbackDuration
-                
-                
-                lastFM.updateNowPlaying(song: Song(
-                    title: songTitle,
-                    artist: songArtist,
-                    album: songAlbum,
-                    favorite: isFavorite
-                ))
+                lastfm.updateNowPlaying(song: nowPlayingItem)
             }
         }
-    }
-    
-    /*
-    func checkIfTrackIsLoved() {
-        let query = MusicKit.
-    }
-    */
-    
-    func checkScrobbleStatus() {
-        if (isScrobbled == .noAttempt && songProgress > (songDuration/2)) {
-            print("scrobbling track")
-            songs.append(Song(
-                title: songTitle,
-                artist: songArtist,
-                album: songAlbum,
-                favorite: isFavorite
-            ))
-            isScrobbled = .pending
-        }
-        
-        scrobble()
-    }
-    
-    func scrobble() {
-        var toScrobble: [Song] = []
-        for track in songs {
-            if track.scrobbled == .pending {
-                toScrobble.append(track)
-                
-            }
-        }
-        
-        
-        if toScrobble.count < 1 {
-            return;
-        } else if toScrobble.count < 2 {
-            Task {
-                if try await lastFM.scrobbleTrack(song: toScrobble[0]) {
-                    print("succesfully scrobbled")
-                    toScrobble[0].scrobbled = .done
-                } else {
-                    print("scrobble failed")
-                    toScrobble[0].scrobbled = .failed
-                }
-            }
-        }
-        
-        let chunks = chunkArray(array: toScrobble, chunkSize: 50)
-        for chunk in chunks {
-            //TODO: Scrobble tracks
-            if lastFM.scrobbleTracks(songs: chunk) {
-                for track in chunk {
-                    track.scrobbled = .done
-                }
-            } else {
-                for track in chunk {
-                    track.scrobbled = .failed
-                }
-            }
-            
-        }
-        
     }
     
 }

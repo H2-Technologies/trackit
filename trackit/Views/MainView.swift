@@ -32,10 +32,16 @@ class Song: Identifiable, Equatable {
     }
     
     init(scrobble: SBKTrackToScrobble) {
-        artist = scrobble.artist
-        title = scrobble.track
-        album = scrobble.album!
-        timestamp = scrobble.timestamp
+        self.artist = scrobble.artist
+        self.title = scrobble.track
+        self.album = scrobble.album!
+        self.timestamp = scrobble.timestamp
+    }
+    
+    init(nowPlaying: MPMediaItem!) {
+        self.artist = nowPlaying.artist!
+        self.title = nowPlaying.title!
+        self.album = nowPlaying.albumTitle!
     }
     
     static func == (lhs: Song, rhs: Song) -> Bool {
@@ -50,9 +56,7 @@ struct MainView: View {
     @EnvironmentObject var lastfm: LastFM
     
     @State private var songs: [Song] = []
-    @State private var songTitle: String = ""
-    @State private var songArtist: String = ""
-    @State private var songAlbum: String = ""
+    @State private var nowPlaying: Song?
     @State private var isScrobbled: ScrobbleStatus = .noAttempt
     //@State private var songArtwork: UIImage = UIImage()
     @State private var isFavorite: Bool = false
@@ -68,56 +72,20 @@ struct MainView: View {
     var body: some View {
         ScrollView {
             //Now Playing Track
-            if songTitle != "" {
-                ZStack {
-                    Color(red: 0.13, green: 0.13, blue: 0.13)
-                    VStack(alignment: .leading) {
-                        Text(songTitle).font(.headline).multilineTextAlignment(.trailing)
-                        HStack {
-                            Text("\(songArtist) - \(songAlbum)")
-                        }.font(.caption)
-                        HStack {
-                            Circle().fill(Color.gray).frame(width: 10, height: 10)
-                            Text("Now Playing").font(.caption).foregroundStyle(Color.gray)
-                            //Image(systemName: isFavorite ? "star.filled" : "star").frame(width: 5, height: 5).padding(.trailing, 5)
-                        }
-                    }
-                }
-                .frame(width: 375, height: 100)
-                .cornerRadius(20)
+            if nowPlaying != nil {
+                SongView(song: nowPlaying!)
             } else if songs.count == 0 {
                 ZStack {
                     Spacer().containerRelativeFrame([.horizontal, .vertical])
                     VStack {
                         Text("No songs played yet").foregroundStyle(Color.gray)
                     }
-                    
                 }
             }
             
-            
             //Tracks not scrobbled
             ForEach(songs) { song in
-                ZStack {
-                    Color(red: 0.13, green: 0.13, blue: 0.13)
-                    VStack(alignment: .leading) {
-                        Text(song.title).font(.headline).multilineTextAlignment(.trailing)
-                        HStack {
-                            Text("\(song.artist) - \(song.album)")
-                        }.font(.caption)
-                        HStack {
-                            Circle().fill(
-                                song.scrobbled == .done ? Color.green : song.scrobbled == .pending ? Color.yellow : song.scrobbled == .failed ? Color.red : Color.gray
-                            ).frame(width: 10, height: 10)
-                            Text(RelativeDateTimeFormatter().localizedString(for: song.timestamp, relativeTo: Date())).font(.caption).foregroundStyle(Color.gray)
-                            //Image(systemName: isFavorite ? "star.filled" : "star").frame(width: 5, height: 5).padding(.trailing, 5)
-                            
-                        }
-                    }
-                }
-                .frame(width: 375, height: 100)
-                .cornerRadius(20)
-                
+                SongView(song: song)
             }
         }.onReceive(songDataTimer) { _ in
             guard lastfm.isInitialized else {
@@ -137,18 +105,21 @@ struct MainView: View {
     
     
     func updatePlaybackInfo() {
+        print("Updating playback info")
+        
         let systemMP = MPMusicPlayerController.systemMusicPlayer
         if systemMP.playbackState == .playing {
             if let nowPlayingItem = systemMP.nowPlayingItem {
                 if (nowPlayingItem.title == nil) {
                     return
-                } else {
-                    
                 }
                 
-                songTitle = nowPlayingItem.title!
-                songArtist = nowPlayingItem.artist!
-                songAlbum = nowPlayingItem.albumTitle!
+                //TODO: REMOVE THIS IS DEBUG
+                if nowPlaying != nil && nowPlayingItem.title != nowPlaying!.title {
+                    songs.insert(nowPlaying!, at: 0)
+                }
+                
+                nowPlaying = Song(nowPlaying: nowPlayingItem)
                 
                 //checkIfTrackIsLoved()
                 

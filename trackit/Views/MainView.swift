@@ -11,46 +11,6 @@ import MediaPlayer
 import ScrobbleKit
 import Foundation
 
-enum ScrobbleStatus {
-    case done, pending, failed, noAttempt
-}
-
-class Song: Identifiable, Equatable {
-    var artist: String = ""
-    var title: String = ""
-    var album: String = ""
-    var scrobbled: ScrobbleStatus = .noAttempt
-    var timestamp: Date = Date()
-    var favorite: Bool = false
-    public var id: String = UUID().uuidString
-    
-    init(title: String, artist: String, album: String, favorite: Bool) {
-        self.artist = artist
-        self.title = title
-        self.album = album
-        self.favorite = favorite
-    }
-    
-    init(scrobble: SBKTrackToScrobble) {
-        self.artist = scrobble.artist
-        self.title = scrobble.track
-        self.album = scrobble.album!
-        self.timestamp = scrobble.timestamp
-    }
-    
-    init(nowPlaying: MPMediaItem!) {
-        self.artist = nowPlaying.artist!
-        self.title = nowPlaying.title!
-        self.album = nowPlaying.albumTitle!
-    }
-    
-    static func == (lhs: Song, rhs: Song) -> Bool {
-        return lhs.title == rhs.title &&
-               lhs.artist == rhs.artist &&
-               lhs.album == rhs.album
-    }
-}
-
 
 struct MainView: View {
     @EnvironmentObject var lastfm: LastFM
@@ -60,9 +20,11 @@ struct MainView: View {
     @State private var isScrobbled: ScrobbleStatus = .noAttempt
     //@State private var songArtwork: UIImage = UIImage()
     @State private var isFavorite: Bool = false
+    @State var playback: Double = 0.0;
     
     //TODO: Optimize for battery
-    private let songDataTimer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
+    private let songDataTimer = Timer.publish(every: 1, on: .main, in: .common)
+        .autoconnect()
     
     init() {
         
@@ -76,9 +38,12 @@ struct MainView: View {
                 SongView(song: nowPlaying!)
             } else if songs.count == 0 {
                 ZStack {
-                    Spacer().containerRelativeFrame([.horizontal, .vertical])
+                    Spacer()
+                        .containerRelativeFrame([.horizontal, .vertical])
+                    
                     VStack {
-                        Text("No songs played yet").foregroundStyle(Color.gray)
+                        Text("No songs played yet")
+                            .foregroundStyle(Color.gray)
                     }
                 }
             }
@@ -87,6 +52,7 @@ struct MainView: View {
             ForEach(songs) { song in
                 SongView(song: song)
             }
+            
         }.onReceive(songDataTimer) { _ in
             guard lastfm.isInitialized else {
                 print("not initialized")
@@ -114,10 +80,20 @@ struct MainView: View {
                     return
                 }
                 
-                //TODO: REMOVE THIS IS DEBUG
+                //Check if new track is playing
                 if nowPlaying != nil && nowPlayingItem.title != nowPlaying!.title {
-                    songs.insert(nowPlaying!, at: 0)
+                    //TODO: REMOVE THIS IS DEBUG
+                    print("new song playing")
+                    shouldScrobble()
                 }
+                
+                //Check if track has been restarted
+                if playback > (systemMP.currentPlaybackTime / nowPlayingItem.playbackDuration) {
+                    print("Track restarted")
+                    shouldScrobble()
+                }
+                
+                playback = systemMP.currentPlaybackTime / nowPlayingItem.playbackDuration
                 
                 nowPlaying = Song(nowPlaying: nowPlayingItem)
                 
@@ -128,4 +104,37 @@ struct MainView: View {
         }
     }
     
+    func shouldScrobble() {
+        if playback >= 0.5 {
+            let song = nowPlaying!
+            song.scrobbled = .pending
+            songs.insert(song, at: 0)
+        }
+        
+        scrobble()
+    }
+    
+    func scrobble() {
+        let toScrobble = songs.filter { $0.scrobbled == .pending || $0.scrobbled == .failed }
+        if toScrobble.count > 50 {
+            //TODO: Chunk array
+        } else {
+            Task {
+                let result = try await lastfm.scrobbleTracks(songs: songs)
+                
+                print(result)
+                
+                if result {
+                    for song in songs {
+                        song.scrobbled = .done
+                    }
+                } else {
+                    for song in songs {
+                        song.scrobbled = .failed
+                    }
+                }
+            }
+            
+        }
+    }
 }

@@ -94,8 +94,33 @@ class LastFM : ObservableObject {
         return false
     }
     
-    func scrobbleTracks(songs: [Song]) -> Bool {
+    func scrobbleTracks(songs: [Song]) async throws -> Bool {
         //TODO: Implement
+        var scrobbles: [SBKTrackToScrobble] = []
+        
+        for song in songs {
+            scrobbles.append(
+                SBKTrackToScrobble(
+                    artist: song.artist,
+                    track: song.title,
+                    timestamp: song.timestamp,
+                    album: song.album
+                )
+            )
+        }
+        
+        let response = try await manager.scrobble(tracks: scrobbles)
+        if response.isCompletelySuccessful {
+            return true
+        } else {
+            if let result = response.results.first {
+                if result.isAccepted {
+                    return true
+                } else if let error = result.error {
+                    return false
+                }
+            }
+        }
         
         return false
     }

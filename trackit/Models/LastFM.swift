@@ -22,11 +22,13 @@ class LastFM : ObservableObject {
     func initManager() -> String? {
         let (username, token) = KeychainInterface.fetchUserInfo()
         
+        
         if username == nil || token == nil {
             return nil
         } else {
             manager.setSessionKey(token!)
             self.isInitialized = true
+            self.username = username!
             return username!
         }
         

@@ -71,7 +71,6 @@ struct MainView: View {
     
     
     func updatePlaybackInfo() {
-        print("Updating playback info")
         
         let systemMP = MPMusicPlayerController.systemMusicPlayer
         if systemMP.playbackState == .playing {
@@ -115,18 +114,23 @@ struct MainView: View {
     }
     
     func scrobble() {
-        let toScrobble = songs.filter { $0.scrobbled == .pending || $0.scrobbled == .failed }
+        let toScrobble = songs.filter({ $0.scrobbled == .pending || $0.scrobbled == .failed })
         if toScrobble.count > 50 {
             //TODO: Chunk array
         } else {
             Task {
-                let result = try await lastfm.scrobbleTracks(songs: songs)
+                let result = try await lastfm.scrobbleTracks(songs: toScrobble)
                 
                 print(result)
                 
-                if result {
-                    for song in songs {
-                        song.scrobbled = .done
+                if result == true {
+                    print("track scrobbled")
+                    for track in toScrobble {
+                        print("updating status")
+                        songs.filter({$0.id == track.id}).forEach {
+                            print($0.title)
+                            $0.scrobbled = .done
+                        }
                     }
                 } else {
                     for song in songs {

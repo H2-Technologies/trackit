@@ -10,14 +10,14 @@
 		AF08FF922DCEE00600B81B98 /* AsyncObjects in Frameworks */ = {isa = PBXBuildFile; productRef = AF08FF912DCEE00600B81B98 /* AsyncObjects */; };
 		AF312A5D2DCC304B00FE22D3 /* OAuthSwift in Frameworks */ = {isa = PBXBuildFile; productRef = AF312A5C2DCC304B00FE22D3 /* OAuthSwift */; };
 		AF4EEB182DCE5C9A00F60EAC /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = AF4EEB172DCE5C9A00F60EAC /* .gitignore */; };
-		AFDEF6952DC5C70300699EB9 /* MusicKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFDEF6942DC5C70300699EB9 /* MusicKit.framework */; };
 		AFDEF69A2DC5C8C500699EB9 /* ScrobbleKit in Frameworks */ = {isa = PBXBuildFile; productRef = AFDEF6992DC5C8C500699EB9 /* ScrobbleKit */; };
+		AFF9EF8A2DDDF8F2001AA974 /* MusicKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AFF9EF882DDDF8E4001AA974 /* MusicKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		AF4EEB172DCE5C9A00F60EAC /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		AFDEF6822DC5BB7600699EB9 /* trackit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = trackit.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AFDEF6942DC5C70300699EB9 /* MusicKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MusicKit.framework; path = System/Library/Frameworks/MusicKit.framework; sourceTree = SDKROOT; };
+		AFF9EF882DDDF8E4001AA974 /* MusicKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MusicKit.framework; path = System/Library/Frameworks/MusicKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -47,9 +47,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF08FF922DCEE00600B81B98 /* AsyncObjects in Frameworks */,
-				AFDEF6952DC5C70300699EB9 /* MusicKit.framework in Frameworks */,
 				AFDEF69A2DC5C8C500699EB9 /* ScrobbleKit in Frameworks */,
 				AF312A5D2DCC304B00FE22D3 /* OAuthSwift in Frameworks */,
+				AFF9EF8A2DDDF8F2001AA974 /* MusicKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,7 +77,7 @@
 		AFDEF6932DC5C70300699EB9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				AFDEF6942DC5C70300699EB9 /* MusicKit.framework */,
+				AFF9EF882DDDF8E4001AA974 /* MusicKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

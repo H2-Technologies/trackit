@@ -28,6 +28,4 @@ struct trackitApp: App {
                 })
         }
     }
-    
-    
 }

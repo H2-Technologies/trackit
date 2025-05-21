@@ -13,7 +13,7 @@ enum ScrobbleStatus {
     case done, pending, failed, noAttempt
 }
 
-class Song: Identifiable, Equatable {
+struct Song: Identifiable, Equatable {
     var artist: String = ""
     var title: String = ""
     var album: String = ""

@@ -17,9 +17,13 @@ struct MainView: View {
     @State private var songs: [Song] = []
     @State private var nowPlaying: Song?
     @State private var isScrobbled: ScrobbleStatus = .noAttempt
+    @State private var lastKnownMPMediaItemPersistentID: MPMediaEntityPersistentID?
+    @State private var internalCurrentPlaybackTime: TimeInterval = 0.0
+    @State private var internalCurrnetPlaybackDuration: TimeInterval = 0.0
+    
     //@State private var songArtwork: UIImage = UIImage()
     @State private var isFavorite: Bool = false
-    @State var playback: Double = 0.0;
+    @State var playbackPercentage: Double = 0.0;
     
     //TODO: Optimize for battery
     private let songDataTimer = Timer.publish(every: 1, on: .main, in: .common)
@@ -75,78 +79,66 @@ struct MainView: View {
         }
         
         let currentPlaybackTime = systemMP.currentPlaybackTime
-        //let playbackDuration
+        let playbackDuration = nowPlayingItem.playbackDuration
         
-//        if systemMP.playbackState == .playing {
-//            if let nowPlayingItem = systemMP.nowPlayingItem {
-//                if (nowPlayingItem.title == nil) {
-//                    return
-//                }
-//                
-//                //Check if new track is playing
-//                if nowPlaying != nil && nowPlayingItem.title != nowPlaying!.title {
-//                    //TODO: REMOVE THIS IS DEBUG
-//                    print("new song playing")
-//                    shouldScrobble()
-//                }
-//                
-//                //Check if track has been restarted
-//                if playback > (systemMP.currentPlaybackTime / nowPlayingItem.playbackDuration) {
-//                    print("Track restarted")
-//                    shouldScrobble()
-//                }
-//                
-//                playback = systemMP.currentPlaybackTime / nowPlayingItem.playbackDuration
-//                
-//                nowPlaying = Song(nowPlaying: nowPlayingItem)
-//                
-//                //checkIfTrackIsLoved()
-//                
-//                lastfm.updateNowPlaying(song: nowPlayingItem)
-//            }
-//        }
-    }
-    
-    func shouldScrobble() {
-        if playback >= 0.5 {
-            var song = nowPlaying!
-            song.scrobbled = .pending
-            songs.insert(song, at: 0)
+        let newPlaybackProgress = currentPlaybackTime / playbackDuration
+        
+        let isNewSong = nowPlaying == nil || nowPlayingItem.title != nowPlaying!.title
+        let hasTrackRestarted = newPlaybackProgress < playbackPercentage && nowPlaying != nil && nowPlayingItem.title == nowPlaying!.title
+        
+        if isNewSong || hasTrackRestarted {
+            if let previouslyPlayingSong = nowPlaying {
+                if playbackPercentage >= 0.5 {
+                    previouslyPlayingSong.scrobbled = .pending
+                    
+                    if !songs.contains(where: { $0.id == previouslyPlayingSong.id }) {
+                        songs.insert(previouslyPlayingSong, at: 0)
+                    }
+                }
+            }
+            nowPlaying = Song(nowPlaying: nowPlayingItem)
         }
         
+        playbackPercentage = newPlaybackProgress
+        
         scrobble()
+        
+        lastfm.updateNowPlaying(song: nowPlayingItem)
+        
+        
+    }
+    
+    func processEligibleSong(song: Song) {
+        
     }
     
     func scrobble() {
         let toScrobble = songs.filter({ $0.scrobbled == .pending || $0.scrobbled == .failed })
-        if toScrobble.count > 50 {
-            //TODO: Chunk array
-        } else {
-            Task {
-                let result = try await lastfm.scrobbleTracks(songs: toScrobble)
-                
-                print(result)
-                
-                await MainActor.run {
-                    if result == true {
-                        print("track scrobbled")
-                        songs = songs.map { songInArray in
-                            if toScrobble.contains(where: { $0.id == songInArray.id }) {
-                                var modifiedSong = songInArray
-                                modifiedSong.scrobbled = .done
-                                return modifiedSong
-                            } else {
-                                return songInArray
-                            }
+        
+        guard !toScrobble.isEmpty else { return } //Nothing to scrobble
+        
+        //TODO: Implement chunking, keeping it simple for now
+        
+        Task {
+            let result = try await lastfm.scrobbleTracks(songs: toScrobble)
+            
+            await MainActor.run {
+                if result {
+                    print("Successfully updated")
+                    for songInArray in songs {
+                        if toScrobble.contains(where: { $0.id == songInArray.id }) {
+                            songInArray.scrobbled = .done
                         }
-                    } else {
-                        for song in songs {
-                            //song.scrobbled = .failed
+                    }
+                } else {
+                    print("Scrobble failed")
+                    for songInArray in songs {
+                        if toScrobble.contains(where: { $0.id == songInArray.id }) {
+                            songInArray.scrobbled = .failed
                         }
                     }
                 }
             }
-            
         }
     }
 }

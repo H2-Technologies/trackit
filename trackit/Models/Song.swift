@@ -20,7 +20,7 @@ class Song: Identifiable, Equatable, ObservableObject, Hashable {
     var timestamp: Date = Date()
     var favorite: Bool = false
    
-    public var id: String = UUID().uuidString
+    public var id: String = UUID().uuidString //Public so it can be accessed without a getter method
     
     @Published var scrobbled: ScrobbleStatus = .noAttempt
     
@@ -44,12 +44,14 @@ class Song: Identifiable, Equatable, ObservableObject, Hashable {
         self.album = nowPlaying.albumTitle!
     }
     
+    // Adhere to Equatable struct
     static func == (lhs: Song, rhs: Song) -> Bool {
         return lhs.title == rhs.title &&
                lhs.artist == rhs.artist &&
                lhs.album == rhs.album
     }
     
+    // Adhere to Hashable struct
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }

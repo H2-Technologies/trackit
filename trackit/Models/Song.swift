@@ -9,18 +9,20 @@ import Foundation
 import ScrobbleKit
 import MediaPlayer
 
-enum ScrobbleStatus {
+enum ScrobbleStatus: Codable, CaseIterable {
     case done, pending, failed, noAttempt
 }
 
-struct Song: Identifiable, Equatable {
+class Song: Identifiable, Equatable, ObservableObject, Hashable {
     var artist: String = ""
     var title: String = ""
     var album: String = ""
-    var scrobbled: ScrobbleStatus = .noAttempt
     var timestamp: Date = Date()
     var favorite: Bool = false
+   
     public var id: String = UUID().uuidString
+    
+    @Published var scrobbled: ScrobbleStatus = .noAttempt
     
     init(title: String, artist: String, album: String, favorite: Bool) {
         self.artist = artist
@@ -46,5 +48,9 @@ struct Song: Identifiable, Equatable {
         return lhs.title == rhs.title &&
                lhs.artist == rhs.artist &&
                lhs.album == rhs.album
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }

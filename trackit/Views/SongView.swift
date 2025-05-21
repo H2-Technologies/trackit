@@ -14,11 +14,7 @@ extension Date {
 }
 
 struct SongView: View {
-    private var song: Song
-    
-    init(song: Song) {
-        self.song = song
-    }
+    @ObservedObject var song: Song
     
     var body: some View {
         ZStack {

@@ -30,7 +30,7 @@ struct MainView: View {
             //Now Playing Track
             if nowPlaying != nil {
                 SongView(song: nowPlaying!)
-            } else if songs.count == 0 {
+            } else if songs.isEmpty {
                 ZStack {
                     Spacer()
                         .containerRelativeFrame([.horizontal, .vertical])
@@ -68,34 +68,43 @@ struct MainView: View {
     
     func updatePlaybackInfo() {
         let systemMP = MPMusicPlayerController.systemMusicPlayer
-        if systemMP.playbackState == .playing {
-            if let nowPlayingItem = systemMP.nowPlayingItem {
-                if (nowPlayingItem.title == nil) {
-                    return
-                }
-                
-                //Check if new track is playing
-                if nowPlaying != nil && nowPlayingItem.title != nowPlaying!.title {
-                    //TODO: REMOVE THIS IS DEBUG
-                    print("new song playing")
-                    shouldScrobble()
-                }
-                
-                //Check if track has been restarted
-                if playback > (systemMP.currentPlaybackTime / nowPlayingItem.playbackDuration) {
-                    print("Track restarted")
-                    shouldScrobble()
-                }
-                
-                playback = systemMP.currentPlaybackTime / nowPlayingItem.playbackDuration
-                
-                nowPlaying = Song(nowPlaying: nowPlayingItem)
-                
-                //checkIfTrackIsLoved()
-                
-                lastfm.updateNowPlaying(song: nowPlayingItem)
-            }
+        guard systemMP.playbackState == .playing,
+              let nowPlayingItem = systemMP.nowPlayingItem,
+              nowPlayingItem.title != nil else {
+            return //Not playing or invalid track
         }
+        
+        let currentPlaybackTime = systemMP.currentPlaybackTime
+        //let playbackDuration
+        
+//        if systemMP.playbackState == .playing {
+//            if let nowPlayingItem = systemMP.nowPlayingItem {
+//                if (nowPlayingItem.title == nil) {
+//                    return
+//                }
+//                
+//                //Check if new track is playing
+//                if nowPlaying != nil && nowPlayingItem.title != nowPlaying!.title {
+//                    //TODO: REMOVE THIS IS DEBUG
+//                    print("new song playing")
+//                    shouldScrobble()
+//                }
+//                
+//                //Check if track has been restarted
+//                if playback > (systemMP.currentPlaybackTime / nowPlayingItem.playbackDuration) {
+//                    print("Track restarted")
+//                    shouldScrobble()
+//                }
+//                
+//                playback = systemMP.currentPlaybackTime / nowPlayingItem.playbackDuration
+//                
+//                nowPlaying = Song(nowPlaying: nowPlayingItem)
+//                
+//                //checkIfTrackIsLoved()
+//                
+//                lastfm.updateNowPlaying(song: nowPlayingItem)
+//            }
+//        }
     }
     
     func shouldScrobble() {

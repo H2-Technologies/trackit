@@ -11,13 +11,6 @@ import MediaPlayer
 import ScrobbleKit
 import Foundation
 
-extension Array {
-    mutating func insertFirst(_ element: Element) {
-        self.insert(element, at: 0)
-    }
-}
-
-
 struct MainView: View {
     @EnvironmentObject var lastfm: LastFM
     
@@ -32,16 +25,11 @@ struct MainView: View {
     private let songDataTimer = Timer.publish(every: 1, on: .main, in: .common)
         .autoconnect()
     
-    init() {
-        
-    }
-    
-    
     var body: some View {
         ScrollView {
             //Now Playing Track
-            if let currentSong = songs.first {
-                SongView(song: currentSong)
+            if nowPlaying != nil {
+                SongView(song: nowPlaying!)
             } else if songs.count == 0 {
                 ZStack {
                     Spacer()
@@ -55,9 +43,10 @@ struct MainView: View {
             }
             
             //Tracks not scrobbled
-            ForEach(songs.dropFirst()) { song in
+            ForEach(songs) { song in
                 SongView(song: song)
             }
+            
         }
         .onReceive(songDataTimer) { _ in
             guard lastfm.isInitialized else {
@@ -85,10 +74,6 @@ struct MainView: View {
                     return
                 }
                 
-                if songs.first == nil {
-                    songs.insertFirst(Song(nowPlaying: nowPlayingItem))
-                }
-                
                 //Check if new track is playing
                 if nowPlaying != nil && nowPlayingItem.title != nowPlaying!.title {
                     //TODO: REMOVE THIS IS DEBUG
@@ -104,6 +89,8 @@ struct MainView: View {
                 
                 playback = systemMP.currentPlaybackTime / nowPlayingItem.playbackDuration
                 
+                nowPlaying = Song(nowPlaying: nowPlayingItem)
+                
                 //checkIfTrackIsLoved()
                 
                 lastfm.updateNowPlaying(song: nowPlayingItem)
@@ -113,7 +100,7 @@ struct MainView: View {
     
     func shouldScrobble() {
         if playback >= 0.5 {
-            var song = songs.first!
+            var song = nowPlaying!
             song.scrobbled = .pending
             songs.insert(song, at: 0)
         }
@@ -131,24 +118,22 @@ struct MainView: View {
                 
                 print(result)
                 
-                if result == true {
-                    print("track scrobbled")
-                    for track in toScrobble {
-                        print("updating status")
-                        songs = songs.map { song in
-                            print("Comparing song \(song.id) to track \(track.id)")
-                            if song.id == track.id {
-                                var modifiedSong = song
+                await MainActor.run {
+                    if result == true {
+                        print("track scrobbled")
+                        songs = songs.map { songInArray in
+                            if toScrobble.contains(where: { $0.id == songInArray.id }) {
+                                var modifiedSong = songInArray
                                 modifiedSong.scrobbled = .done
                                 return modifiedSong
                             } else {
-                                return song
+                                return songInArray
                             }
                         }
-                    }
-                } else {
-                    for song in songs {
-                        //song.scrobbled = .failed
+                    } else {
+                        for song in songs {
+                            //song.scrobbled = .failed
+                        }
                     }
                 }
             }

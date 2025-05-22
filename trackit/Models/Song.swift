@@ -17,9 +17,9 @@ class Song: Identifiable, Equatable, ObservableObject, Hashable {
     var artist: String = ""
     var title: String = ""
     var album: String = ""
-    var timestamp: Date = Date()
+    @Published var timestamp: Date = Date() // @Published to allow SongView to react to timestamp changes
     var favorite: Bool = false
-   
+    
     public var id: String = UUID().uuidString //Public so it can be accessed without a getter method
     
     @Published var scrobbled: ScrobbleStatus = .noAttempt
@@ -42,16 +42,17 @@ class Song: Identifiable, Equatable, ObservableObject, Hashable {
         self.artist = nowPlaying.artist!
         self.title = nowPlaying.title!
         self.album = nowPlaying.albumTitle!
+        // IMPORTANT: Set the timestamp here so SongView can correctly identify "Now Playing"
+        self.timestamp = Date()
     }
     
-    // Adhere to Equatable struct
+    // Adhere to Equatable: Now compares by the unique instance ID
+    // This ensures that each distinct playback session (identified by its UUID) is treated as unique.
     static func == (lhs: Song, rhs: Song) -> Bool {
-        return lhs.title == rhs.title &&
-               lhs.artist == rhs.artist &&
-               lhs.album == rhs.album
+        return lhs.id == rhs.id
     }
     
-    // Adhere to Hashable struct
+    // Adhere to Hashable: Hash by the unique instance ID
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }

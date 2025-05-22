@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleIdentifier</key>
-	<string></string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -16,14 +14,6 @@
 				<string>trackit</string>
 			</array>
 		</dict>
-	</array>
-	<key>NSAppleMusicUsageDescription</key>
-	<string>To provide last.fm with your listening data.</string>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>fetch</string>
-		<string>processing</string>
-		<string>audio</string>
 	</array>
 </dict>
 </plist>

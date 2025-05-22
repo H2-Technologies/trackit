@@ -49,7 +49,7 @@ struct MainView: View {
             if let currentNowPlaying = nowPlaying {
                 // Pass the current live playback percentage to the SongView
                 // as the Song object itself doesn't store this.
-                SongView(song: currentNowPlaying)
+                SongView(currentNowPlaying, nowPlaying: true)
             } else if songs.isEmpty { // Use .isEmpty for clarity
                 ZStack {
                     Spacer()
@@ -67,7 +67,7 @@ struct MainView: View {
             ForEach(songs) { song in
                 // For historical songs in the list, their playback percentage is fixed
                 // at the point they became eligible, or can be 0 if not needed.
-                SongView(song: song) // Or a stored eligible percentage if you add it to Song
+                SongView(song) // Or a stored eligible percentage if you add it to Song
             }
         }
         .onReceive(songDataTimer) { _ in

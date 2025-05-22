@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Foundation // Ensure Foundation is imported for Date and TimeInterval
 
 extension Date {
     func seconds(from date: Date) -> TimeInterval {
@@ -15,6 +16,24 @@ extension Date {
 
 struct SongView: View {
     @ObservedObject var song: Song
+    
+    // Add a state variable to trigger periodic updates for the time display
+    @State private var now: Date = Date()
+    
+    private var nowPlaying: Bool = false
+    
+    // A timer to update the 'now' state variable every second
+    private let timer = Timer.publish(every: 60, on: .main, in: .common)
+        .autoconnect()
+    
+    init(_ song: Song) {
+        self.song = song
+    }
+    
+    init(_ song: Song, nowPlaying: Bool) {
+        self.song = song
+        self.nowPlaying = nowPlaying
+    }
     
     var body: some View {
         ZStack {
@@ -33,7 +52,9 @@ struct SongView: View {
                     Circle()
                         .fill(getScrobbleStatus(status: song.scrobbled))
                         .frame(width: 10, height: 10)
-                    Text(getTime(input: song.timestamp))
+                    // The getTime function now uses the 'now' state variable,
+                    // which is updated by the timer.
+                    Text(nowPlaying ? "Now Playing" : getTime(input: song.timestamp, currentTime: now))
                         .font(.caption)
                         .foregroundStyle(Color.gray)
                     //Image(systemName: isFavorite ? "star.filled" : "star").frame(width: 5, height: 5).padding(.trailing, 5)
@@ -42,6 +63,10 @@ struct SongView: View {
         }
         .frame(width: 375, height: 100)
         .cornerRadius(20)
+        // Add the onReceive modifier to update the 'now' state variable
+        .onReceive(timer) { newDate in
+            self.now = newDate // Update 'now' every second to trigger re-render
+        }
     }
     
     func getScrobbleStatus(status: ScrobbleStatus) -> Color {
@@ -53,11 +78,13 @@ struct SongView: View {
         }
     }
     
-    func getTime(input: Date) -> String {
-        if input.seconds(from: Date()) <= 1.0 {
-            return "Now Playing"
+    // Modified getTime function to accept a currentTime parameter
+    func getTime(input: Date, currentTime: Date) -> String {
+        // Use currentTime instead of Date() directly to ensure reactivity
+        if input.seconds(from: currentTime) <= 1.0 {
+            return "A Few Moments Ago"
         } else {
-            return RelativeDateTimeFormatter().localizedString(for: input, relativeTo: Date())
+            return RelativeDateTimeFormatter().localizedString(for: input, relativeTo: currentTime)
         }
     }
 }

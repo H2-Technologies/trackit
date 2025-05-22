@@ -19,6 +19,7 @@ class Song: Identifiable, Equatable, ObservableObject, Hashable {
     var album: String = ""
     @Published var timestamp: Date = Date() // @Published to allow SongView to react to timestamp changes
     var favorite: Bool = false
+    var artwork: UIImage?
     
     public var id: String = UUID().uuidString //Public so it can be accessed without a getter method
     
@@ -29,6 +30,7 @@ class Song: Identifiable, Equatable, ObservableObject, Hashable {
         self.title = title
         self.album = album
         self.favorite = favorite
+        self.artwork = nil
     }
     
     init(scrobble: SBKTrackToScrobble) {
@@ -36,6 +38,7 @@ class Song: Identifiable, Equatable, ObservableObject, Hashable {
         self.title = scrobble.track
         self.album = scrobble.album!
         self.timestamp = scrobble.timestamp
+        self.artwork = nil
     }
     
     init(nowPlaying: MPMediaItem!) {
@@ -44,6 +47,7 @@ class Song: Identifiable, Equatable, ObservableObject, Hashable {
         self.album = nowPlaying.albumTitle!
         // IMPORTANT: Set the timestamp here so SongView can correctly identify "Now Playing"
         self.timestamp = Date()
+        self.artwork = nowPlaying.artwork!.image(at: CGSize(width: 1024, height: 1024)) ?? UIImage()
     }
     
     // Adhere to Equatable: Now compares by the unique instance ID

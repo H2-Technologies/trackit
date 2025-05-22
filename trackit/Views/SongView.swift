@@ -38,28 +38,34 @@ struct SongView: View {
     var body: some View {
         ZStack {
             Color(red: 0.13, green: 0.13, blue: 0.13)
-            VStack(alignment: .leading) {
-                Text(song.title)
-                    .font(.headline)
-                    .multilineTextAlignment(.leading)
-                
-                HStack {
-                    Text("\(song.artist) - \(song.album)")
+            HStack() {
+                Image(uiImage: song.artwork!).resizable().frame(width: 75, height: 75, alignment: .leading).cornerRadius(10)
+                VStack(alignment: .leading) {
+                    Text(song.title)
+                        .font(.headline)
+                        .multilineTextAlignment(.leading)
+                    
+                    HStack {
+                        Text("\(song.artist) - \(song.album)")
+                    }
+                    .font(.caption)
+                    
+                    HStack {
+                        Circle()
+                            .fill(getScrobbleStatus(status: song.scrobbled))
+                            .frame(width: 10, height: 10)
+                        // The getTime function now uses the 'now' state variable,
+                        // which is updated by the timer.
+                        Text(nowPlaying ? "Now Playing" : getTime(input: song.timestamp, currentTime: now))
+                            .font(.caption)
+                            .foregroundStyle(Color.gray)
+                        //Image(systemName: isFavorite ? "star.filled" : "star").frame(width: 5, height: 5).padding(.trailing, 5)
+                    }
                 }
-                .font(.caption)
                 
-                HStack {
-                    Circle()
-                        .fill(getScrobbleStatus(status: song.scrobbled))
-                        .frame(width: 10, height: 10)
-                    // The getTime function now uses the 'now' state variable,
-                    // which is updated by the timer.
-                    Text(nowPlaying ? "Now Playing" : getTime(input: song.timestamp, currentTime: now))
-                        .font(.caption)
-                        .foregroundStyle(Color.gray)
-                    //Image(systemName: isFavorite ? "star.filled" : "star").frame(width: 5, height: 5).padding(.trailing, 5)
-                }
+                Spacer()
             }
+            .padding()
         }
         .frame(width: 375, height: 100)
         .cornerRadius(20)
